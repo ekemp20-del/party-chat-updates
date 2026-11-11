@@ -1,10 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" data-partychat-version="1.0.3"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script>
-/* Party Chat update bootstrap. Keep this in every published build. */
+<html lang="en" data-partychat-version="1.0.4"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script>
+/* Party Chat bootstrap. Older settings/history keys are deliberately preserved. */
 (function () {
   'use strict';
-  var CURRENT_VERSION = '1.0.3';
-  var CACHE_KEY = 'partychat.update.staged.v1';
+  var BASE_VERSION = '1.0.4';
+  var ACTIVE_KEY = 'partychat.runtime.active.v1';
+  var LEGACY_STAGE_KEY = 'partychat.update.staged.v1';
+  var FRAME_NAME = 'partychat-update-runtime';
+  window.__PARTYCHAT_BOOTSTRAP_ONLY__ = false;
+
   function compareVersions(a, b) {
     var aa = String(a).split('.').map(function (x) { return parseInt(x, 10) || 0; });
     var bb = String(b).split('.').map(function (x) { return parseInt(x, 10) || 0; });
@@ -14,38 +18,54 @@
     }
     return 0;
   }
+
+  /* The srcdoc app is the runtime. Do not create another frame inside it. */
+  if (window.parent !== window && window.name === FRAME_NAME) return;
+
   try {
-    var raw = localStorage.getItem(CACHE_KEY);
+    /* Migration from the automatic-updater generations. Only the updater cache is
+       removed; names, themes, messages, IDs and all other user data are untouched. */
+    var legacy = localStorage.getItem(LEGACY_STAGE_KEY);
+    if (legacy) {
+      try {
+        var oldStage = JSON.parse(legacy);
+        if (!oldStage || typeof oldStage.html !== 'string' || compareVersions(oldStage.version, BASE_VERSION) <= 0) {
+          localStorage.removeItem(LEGACY_STAGE_KEY);
+        } else {
+          /* Do not auto-apply an older updater's staged release. It can be checked
+             again manually from Settings using the current verified update process. */
+          localStorage.removeItem(LEGACY_STAGE_KEY);
+        }
+      } catch (_) { localStorage.removeItem(LEGACY_STAGE_KEY); }
+    }
+
+    var raw = localStorage.getItem(ACTIVE_KEY);
     if (!raw) return;
-    var staged = JSON.parse(raw);
-    if (!staged || !staged.version || typeof staged.html !== 'string') {
-      localStorage.removeItem(CACHE_KEY); return;
+    var active = JSON.parse(raw);
+    if (!active || typeof active.html !== 'string' || !/^\d+(\.\d+){1,3}$/.test(String(active.version || '')) ||
+        active.html.length < 10000 || active.html.length > 2500000) {
+      localStorage.removeItem(ACTIVE_KEY); return;
     }
-    if (compareVersions(staged.version, CURRENT_VERSION) < 0) {
-      localStorage.removeItem(CACHE_KEY); return;
+    if (compareVersions(active.version, BASE_VERSION) <= 0 && active.forceRollback !== true) {
+      localStorage.removeItem(ACTIVE_KEY); return;
     }
-    var marker = 'data-partychat-version="' + staged.version + '"';
-    if (staged.html.indexOf(marker) === -1 || staged.html.indexOf('<title>Party Chat</title>') === -1) {
-      localStorage.removeItem(CACHE_KEY); return;
+    var marker = 'data-partychat-version="' + active.version + '"';
+    if (active.html.indexOf(marker) === -1 || active.html.indexOf('<title>Party Chat</title>') === -1) {
+      localStorage.removeItem(ACTIVE_KEY); return;
     }
-    /*
-       Do not use document.write here. When the updater runs from a script in the
-       original file's <head>, the original HTML parser can resume after document.write
-       and append a second copy of the app. Instead, display the verified release in a
-       full-viewport srcdoc frame. srcdoc inherits this local file's origin, so the app
-       keeps access to the same localStorage, camera permissions and WebSocket APIs.
-       Keep the staged release in storage: the user's original HTML file is not
-       overwritten, so this cached release must remain available on every launch.
-    */
+
+    window.__PARTYCHAT_BOOTSTRAP_ONLY__ = true;
     var frame = document.createElement('iframe');
+    frame.name = FRAME_NAME;
     frame.title = 'Party Chat';
     frame.setAttribute('allow', 'camera; microphone; clipboard-read; clipboard-write');
     frame.setAttribute('referrerpolicy', 'no-referrer');
-    frame.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;display:block;border:0;margin:0;padding:0;z-index:2147483647;background:var(--bg,#f2f2f7);';
-    frame.srcdoc = staged.html;
+    frame.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;display:block;border:0;margin:0;padding:0;z-index:2147483647;background:#f2f2f7;';
+    frame.srcdoc = active.html;
     document.documentElement.appendChild(frame);
   } catch (e) {
-    /* Storage can be disabled for some file:// configurations; keep the local build running. */
+    /* If storage is unavailable or malformed, run the local HTML release normally. */
+    window.__PARTYCHAT_BOOTSTRAP_ONLY__ = false;
   }
 })();
 </script>
@@ -266,6 +286,62 @@ body.dark{
   #settingsBtn.settings-trigger{width:50px;min-width:50px;flex-basis:50px}
 }
 
+
+/* Party Chat 1.0.4 — manual updates, reversible browser patching and stronger theme gradients */
+#settingsBtn.settings-trigger{
+  align-self:center!important;height:44px!important;min-height:44px!important;width:auto!important;min-width:122px!important;
+  flex:0 0 auto!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;
+  gap:9px!important;padding:0 15px!important;border:1px solid var(--border)!important;border-radius:13px!important;
+  background:var(--surface)!important;color:var(--text)!important;box-shadow:0 2px 9px rgba(0,0,0,.07)!important;
+}
+#settingsBtn.settings-trigger .settings-gear{
+  display:block!important;height:auto!important;line-height:1!important;font-family:"Segoe UI Symbol","Noto Sans Symbols 2",sans-serif!important;
+  font-size:25px!important;font-weight:400!important;color:var(--accent)!important;
+}
+#settingsBtn.settings-trigger .settings-caption{
+  display:block!important;font-size:13px!important;line-height:1!important;font-weight:750!important;letter-spacing:0!important;color:var(--text)!important;
+}
+#settingsBtn.settings-trigger:hover,#settingsBtn.settings-trigger[aria-expanded="true"]{
+  background:var(--accent-soft)!important;border-color:color-mix(in srgb,var(--accent) 45%,var(--border))!important;
+}
+#settingsBtn.settings-trigger:active{transform:scale(.98)}
+@media(max-width:760px){
+  #settingsBtn.settings-trigger{height:42px!important;min-height:42px!important;min-width:106px!important;padding:0 11px!important;gap:7px!important}
+  #settingsBtn.settings-trigger .settings-gear{font-size:22px!important}
+  #settingsBtn.settings-trigger .settings-caption{font-size:12px!important}
+}
+@media(max-width:520px){
+  #settingsBtn.settings-trigger{height:37px!important;min-height:37px!important;min-width:94px!important;padding:0 8px!important;gap:5px!important;border-radius:11px!important}
+  #settingsBtn.settings-trigger .settings-gear{font-size:20px!important}
+  #settingsBtn.settings-trigger .settings-caption{font-size:11px!important}
+  #name{width:112px!important}
+}
+@media(max-width:365px){
+  #settingsBtn.settings-trigger{min-width:82px!important;width:82px!important;padding:0 6px!important;gap:4px!important}
+  #settingsBtn.settings-trigger .settings-gear{font-size:18px!important}
+  #settingsBtn.settings-trigger .settings-caption{font-size:10px!important}
+  #name{width:76px!important}
+  #namebar>label{font-size:8px!important;letter-spacing:0!important}
+}
+.update-buttons{flex-wrap:wrap;align-items:center}
+.update-action.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.rollback-action{border-color:color-mix(in srgb,var(--danger) 40%,var(--border));color:var(--danger);background:color-mix(in srgb,var(--danger) 7%,var(--surface))}
+.update-help{font-size:9px;line-height:1.5;color:var(--muted);padding:2px 1px 5px}
+body.theme-blue,body.theme-green,body.theme-purple,body.theme-red,body.theme-orange,body.theme-pink,body.theme-cyan,body.theme-yellow{
+  --chat-gradient-a:color-mix(in srgb,var(--accent) 23%,var(--bg));
+  --chat-gradient-b:color-mix(in srgb,var(--accent) 12%,var(--bg));
+}
+body.dark.theme-blue,body.dark.theme-green,body.dark.theme-purple,body.dark.theme-red,body.dark.theme-orange,body.dark.theme-pink,body.dark.theme-cyan,body.dark.theme-yellow{
+  --chat-gradient-a:color-mix(in srgb,var(--accent) 27%,var(--bg));
+  --chat-gradient-b:color-mix(in srgb,var(--accent) 16%,var(--bg));
+}
+body.theme-blue #messages,body.theme-green #messages,body.theme-purple #messages,body.theme-red #messages,body.theme-orange #messages,body.theme-pink #messages,body.theme-cyan #messages,body.theme-yellow #messages{
+  background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 13%,transparent),transparent 48%,color-mix(in srgb,var(--accent) 8%,transparent));
+}
+body.dark.theme-blue #messages,body.dark.theme-green #messages,body.dark.theme-purple #messages,body.dark.theme-red #messages,body.dark.theme-orange #messages,body.dark.theme-pink #messages,body.dark.theme-cyan #messages,body.dark.theme-yellow #messages{
+  background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 17%,transparent),transparent 48%,color-mix(in srgb,var(--accent) 10%,transparent));
+}
+
 </style></head><body>
 <header>
   <div class="brand">
@@ -278,7 +354,7 @@ body.dark{
       <div class="name-controls"><input id="name" maxlength="24" placeholder="Enter your name" autocomplete="off"><span id="people">0 online</span></div>
     </div>
     <button id="settingsBtn" class="settings-trigger" type="button" title="Open settings" aria-label="Open settings" aria-haspopup="true" aria-expanded="false">
-      <span class="settings-gear" aria-hidden="true">&#x2699;&#xFE0E;</span>
+      <span class="settings-gear" aria-hidden="true">&#x2261;</span>
       <span class="settings-caption">Settings</span>
     </button>
   </div>
@@ -300,9 +376,12 @@ body.dark{
   </div>
   <div class="settings-section">
     <div class="settings-section-label">APP</div>
-    <div class="settings-row"><span>Version</span><strong id="updateInstalledVersion" style="font-size:11px;font-weight:650">v1.0.3</strong></div>
-    <div class="settings-row update-settings-row"><div style="min-width:0;flex:1"><div style="font-size:11px;font-weight:650">Software updates</div><div id="updateStatus" class="update-status" role="status" aria-live="polite">Automatic update checks are enabled.</div><div id="updateLastCheck" class="update-last-check">Not checked yet</div></div></div>
-    <div class="settings-row update-buttons"><button type="button" id="checkUpdatesBtn" class="update-action">Check now</button><button type="button" id="applyUpdateBtn" class="update-action primary" hidden>Restart to update</button></div>
+    <div class="settings-row"><span>Version</span><strong id="updateInstalledVersion" style="font-size:11px;font-weight:650">v1.0.4</strong></div>
+    <div class="settings-row update-settings-row"><div style="min-width:0;flex:1"><div style="font-size:11px;font-weight:650">Software updates</div><div id="updateStatus" class="update-status" role="status" aria-live="polite">Updates are manual. Select Check for updates when you want to look for a release.</div><div id="updateLastCheck" class="update-last-check">No background checks or downloads.</div></div></div>
+    <div class="settings-row update-buttons"><button type="button" id="checkUpdatesBtn" class="update-action primary">Check for updates</button></div>
+    <div class="settings-row update-buttons"><button type="button" id="downloadUpdateBtn" class="update-action" hidden>Download new HTML</button><button type="button" id="patchUpdateBtn" class="update-action primary" hidden>Patch this browser</button></div>
+    <div class="settings-row update-buttons"><button type="button" id="rollbackUpdateBtn" class="update-action rollback-action" hidden>Rollback</button></div>
+    <div class="update-help">Download new HTML saves a replacement file. Patch this browser runs the new version from local browser storage; it does not overwrite the original file. A backup is kept so you can roll back.</div>
     <div class="settings-row"><span>Image quality</span><strong style="font-size:11px;font-weight:650">Automatic · maximum</strong></div>
     <div class="settings-row"><span class="settings-note">Original images are kept when they fit. Larger images are compressed to the highest practical quality for the WebSocket frame limit.</span></div>
     <a class="github-link" href="https://github.com/ekemp20-del/party-chat-updates" target="_blank" rel="noopener noreferrer"><span class="github-mark">⌘</span><span><strong>GitHub repository</strong><small>View source and releases</small></span><span class="settings-link-arrow">↗</span></a>
@@ -336,6 +415,7 @@ body.dark{
 </div>
 <div id="imageViewer" class="image-viewer" role="dialog" aria-modal="true" aria-label="Image preview"><button type="button" id="imageViewerClose" class="image-viewer-close" aria-label="Close image">✕</button><img id="imageViewerImage" alt="Expanded shared image"></div>
 <script>
+if (!window.__PARTYCHAT_BOOTSTRAP_ONLY__) {
 const ROUTER='wss://router.metapage.io/';
 const CHANNEL='public-chat-v1';
 const LEGACY_BRIDGE='https://ntfy.sh/party-chat-ie11-7x4p92qk-v1';
@@ -755,19 +835,23 @@ setInterval(()=>{recordPopulation();updateDiagVisuals();updateStatusPanel()},500
 try{const h=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');h.slice(-50).forEach(d=>add(d,d.clientId===clientId,false))}catch{}
 connect();
 setInterval(()=>{if($('peoplePanel').classList.contains('open')){renderPeoplePanel();updateActivityPanel()}},1000);
+}
 </script>
 <script>
-/* Party Chat updater: GitHub is used only to distribute app versions. Chat traffic
-   continues to use the existing WebSocket relay and is never routed through GitHub. */
+/* Party Chat manual updater. GitHub distributes app files only, never chat traffic. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.0.3';
+  if (window.__PARTYCHAT_BOOTSTRAP_ONLY__) return;
+
+  var APP_VERSION = '1.0.4';
   var MANIFEST_URL = 'https://raw.githubusercontent.com/ekemp20-del/party-chat-updates/main/manifest.json';
   var BASE_URL = 'https://raw.githubusercontent.com/ekemp20-del/party-chat-updates/main/';
-  var CACHE_KEY = 'partychat.update.staged.v1';
-  var lastCheckAt = 0;
+  var ACTIVE_KEY = 'partychat.runtime.active.v1';
+  var BACKUP_KEY = 'partychat.runtime.backup.v1';
+  var LEGACY_STAGE_KEY = 'partychat.update.staged.v1';
+  var availableRelease = null;
   var checkInProgress = false;
-  var stagedVersion = null;
+
   function el(id) { return document.getElementById(id); }
   function compareVersions(a, b) {
     var aa = String(a).split('.').map(function (x) { return parseInt(x, 10) || 0; });
@@ -780,98 +864,156 @@ setInterval(()=>{if($('peoplePanel').classList.contains('open')){renderPeoplePan
   }
   function setStatus(message, detail) {
     if (el('updateStatus')) el('updateStatus').textContent = message;
-    if (el('updateLastCheck') && detail) el('updateLastCheck').textContent = detail;
+    if (el('updateLastCheck')) el('updateLastCheck').textContent = detail || '';
   }
-  function showStaged(version) {
-    stagedVersion = version;
-    if (el('applyUpdateBtn')) el('applyUpdateBtn').hidden = false;
-    setStatus('Update v' + version + ' is downloaded and ready. Restart Party Chat to install it.',
-      'Downloaded and verified · ' + new Date().toLocaleString());
+  function readRecord(key) {
+    try {
+      var record = JSON.parse(localStorage.getItem(key) || 'null');
+      if (!record || typeof record.html !== 'string' || !/^\d+(\.\d+){1,3}$/.test(String(record.version || '')) ||
+          record.html.length < 10000 || record.html.length > 2500000) return null;
+      if (record.html.indexOf('data-partychat-version="' + record.version + '"') === -1 ||
+          record.html.indexOf('<title>Party Chat</title>') === -1) return null;
+      return record;
+    } catch (_) { return null; }
+  }
+  function updateRollbackButton() {
+    var backup = readRecord(BACKUP_KEY);
+    var btn = el('rollbackUpdateBtn');
+    if (!btn) return;
+    var canRollback = !!backup && compareVersions(backup.version, APP_VERSION) < 0;
+    btn.hidden = !canRollback;
+    if (canRollback) btn.textContent = 'Rollback to v' + backup.version;
   }
   function bytesToHex(buffer) {
     return Array.prototype.map.call(new Uint8Array(buffer), function (b) { return b.toString(16).padStart(2, '0'); }).join('');
   }
   async function sha256(text) {
-    if (!window.crypto || !crypto.subtle || !window.TextEncoder) throw new Error('Secure SHA-256 verification is not available in this browser.');
+    if (!window.crypto || !window.crypto.subtle || !window.TextEncoder) {
+      throw new Error('This browser cannot securely verify the update. Use Download HTML instead.');
+    }
     var bytes = new TextEncoder().encode(text);
-    return bytesToHex(await crypto.subtle.digest('SHA-256', bytes));
+    return bytesToHex(await window.crypto.subtle.digest('SHA-256', bytes));
   }
-  async function checkForUpdates(manual) {
+  async function checkForUpdates() {
     if (checkInProgress) return;
     checkInProgress = true;
+    availableRelease = null;
+    ['downloadUpdateBtn', 'patchUpdateBtn'].forEach(function (id) { if (el(id)) el(id).hidden = true; });
     if (el('checkUpdatesBtn')) { el('checkUpdatesBtn').disabled = true; el('checkUpdatesBtn').textContent = 'Checking…'; }
-    setStatus('Checking GitHub for updates…');
+    setStatus('Checking GitHub for updates…', 'Nothing downloads unless you choose an update option.');
     try {
-      var manifestResponse = await fetch(MANIFEST_URL + '?cacheBust=' + Date.now(), { cache: 'no-store', mode: 'cors' });
+      var manifestResponse = await fetch(MANIFEST_URL + '?manualCheck=' + Date.now(), { cache: 'no-store', mode: 'cors' });
       if (!manifestResponse.ok) throw new Error('Update manifest returned HTTP ' + manifestResponse.status + '.');
       var manifest = await manifestResponse.json();
-      if (!manifest || manifest.app !== 'Party Chat' || !/^\d+(\.\d+){1,3}$/.test(String(manifest.version || ''))) throw new Error('The update manifest is invalid.');
+      if (!manifest || manifest.app !== 'Party Chat' || !/^\d+(\.\d+){1,3}$/.test(String(manifest.version || ''))) {
+        throw new Error('The update manifest is invalid.');
+      }
       if (compareVersions(manifest.version, APP_VERSION) <= 0) {
-        var prior = null;
-        try { prior = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); } catch (_) {}
-        if (prior && compareVersions(prior.version, APP_VERSION) > 0) {
-          showStaged(prior.version);
-        } else {
-          if (prior && compareVersions(prior.version, APP_VERSION) < 0) localStorage.removeItem(CACHE_KEY);
-          stagedVersion = null;
-          if (el('applyUpdateBtn')) el('applyUpdateBtn').hidden = true;
-          setStatus('You are up to date · v' + APP_VERSION, 'Last checked · ' + new Date().toLocaleString());
-        }
+        /* Remove obsolete staging data from the previous automatic updater. */
+        try { localStorage.removeItem(LEGACY_STAGE_KEY); } catch (_) {}
+        setStatus('You are up to date · v' + APP_VERSION, 'Checked manually · ' + new Date().toLocaleString());
+        updateRollbackButton();
         return;
       }
-      if (typeof manifest.sha256 !== 'string' || !/^[a-f0-9]{64}$/i.test(manifest.sha256)) throw new Error('The manifest is missing a valid SHA-256 checksum.');
+      if (typeof manifest.sha256 !== 'string' || !/^[a-f0-9]{64}$/i.test(manifest.sha256)) {
+        throw new Error('The manifest is missing a valid SHA-256 checksum.');
+      }
       var fileName = manifest.file || 'PartyChat.html';
       if (fileName !== 'PartyChat.html') throw new Error('The update filename is not allowed.');
-      var appResponse = await fetch(BASE_URL + fileName + '?cacheBust=' + Date.now(), { cache: 'no-store', mode: 'cors' });
+      var appResponse = await fetch(BASE_URL + fileName + '?manualDownload=' + Date.now(), { cache: 'no-store', mode: 'cors' });
       if (!appResponse.ok) throw new Error('The update download returned HTTP ' + appResponse.status + '.');
       var html = await appResponse.text();
       if (html.length < 10000 || html.length > 2500000) throw new Error('The downloaded update has an unexpected size.');
-      var expectedMarker = 'data-partychat-version="' + manifest.version + '"';
-      if (html.indexOf(expectedMarker) === -1 || html.indexOf('<title>Party Chat</title>') === -1 || html.indexOf('partychat.update.staged.v1') === -1) {
+      if (html.indexOf('data-partychat-version="' + manifest.version + '"') === -1 ||
+          html.indexOf('<title>Party Chat</title>') === -1 || html.indexOf('partychat.runtime.active.v1') === -1) {
         throw new Error('The downloaded file failed its application checks.');
       }
       var actualHash = await sha256(html);
-      if (actualHash.toLowerCase() !== manifest.sha256.toLowerCase()) throw new Error('The SHA-256 checksum did not match. The update was discarded.');
-      var staged = { version: manifest.version, html: html, sha256: actualHash, stagedAt: new Date().toISOString() };
-      localStorage.setItem(CACHE_KEY, JSON.stringify(staged));
-      showStaged(manifest.version);
+      if (actualHash.toLowerCase() !== manifest.sha256.toLowerCase()) {
+        throw new Error('The SHA-256 checksum did not match. The update was discarded.');
+      }
+      availableRelease = { version: manifest.version, file: fileName, html: html, sha256: actualHash, notes: manifest.notes || '' };
+      setStatus('Version v' + manifest.version + ' is available.', 'Verified · choose Download HTML or Patch this browser.');
+      if (el('downloadUpdateBtn')) el('downloadUpdateBtn').hidden = false;
+      if (el('patchUpdateBtn')) el('patchUpdateBtn').hidden = false;
+      if (el('patchUpdateBtn')) el('patchUpdateBtn').textContent = 'Patch this browser';
+      updateRollbackButton();
     } catch (err) {
-      setStatus((err && err.message) ? err.message : 'Could not check for updates.', 'Last attempted · ' + new Date().toLocaleString());
-      if (typeof debugLog === 'function') debugLog('WARN', 'Software update check failed', { error: String(err) });
+      setStatus((err && err.message) ? err.message : 'Could not check for updates.', 'Check again when you are connected to the internet.');
+      if (typeof debugLog === 'function') debugLog('WARN', 'Manual software update check failed', { error: String(err) });
     } finally {
-      lastCheckAt = Date.now();
       checkInProgress = false;
-      if (el('checkUpdatesBtn')) { el('checkUpdatesBtn').disabled = false; el('checkUpdatesBtn').textContent = 'Check now'; }
+      if (el('checkUpdatesBtn')) { el('checkUpdatesBtn').disabled = false; el('checkUpdatesBtn').textContent = 'Check for updates'; }
+    }
+  }
+  function downloadHtml() {
+    if (!availableRelease) return;
+    var blob = new Blob([availableRelease.html], { type: 'text/html;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'PartyChat-v' + availableRelease.version + '.html';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+    setStatus('PartyChat-v' + availableRelease.version + '.html has been downloaded.', 'Replace your existing HTML file manually to use it as your launch file.');
+  }
+  function currentHtmlSnapshot() {
+    var html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    if (html.indexOf('data-partychat-version="' + APP_VERSION + '"') === -1) {
+      throw new Error('Could not make a valid backup of the currently running version.');
+    }
+    return html;
+  }
+  function reloadLaunchFile() {
+    try {
+      if (window.parent && window.parent !== window) window.parent.location.reload();
+      else window.location.reload();
+    } catch (_) { window.location.reload(); }
+  }
+  function patchThisBrowser() {
+    if (!availableRelease) return;
+    var ok = window.confirm('Install Party Chat v' + availableRelease.version + ' in this browser?\n\nA backup of v' + APP_VERSION + ' will be kept for rollback. Your original HTML file on disk will not be overwritten.');
+    if (!ok) return;
+    try {
+      var backupHtml = currentHtmlSnapshot();
+      var backup = { version: APP_VERSION, html: backupHtml, savedAt: new Date().toISOString() };
+      var active = { version: availableRelease.version, html: availableRelease.html, sha256: availableRelease.sha256, installedAt: new Date().toISOString() };
+      localStorage.setItem(BACKUP_KEY, JSON.stringify(backup));
+      localStorage.setItem(ACTIVE_KEY, JSON.stringify(active));
+      localStorage.removeItem(LEGACY_STAGE_KEY);
+      setStatus('Patch saved. Restarting Party Chat in this browser…', 'Your previous version is backed up for rollback.');
+      setTimeout(reloadLaunchFile, 250);
+    } catch (err) {
+      setStatus('Could not save the update in this browser.', (err && err.message) || String(err));
+    }
+  }
+  function rollback() {
+    var backup = readRecord(BACKUP_KEY);
+    if (!backup) { updateRollbackButton(); return; }
+    var ok = window.confirm('Roll back Party Chat to v' + backup.version + '?\n\nThe current browser-installed version will be removed.');
+    if (!ok) return;
+    try {
+      /* Force the verified backup even if the user's downloaded launch file is newer.
+         The outer bootstrap recognises this explicit rollback marker. */
+      var rollbackRecord = Object.assign({}, backup, { forceRollback: true });      localStorage.setItem(ACTIVE_KEY, JSON.stringify(rollbackRecord));
+      localStorage.removeItem(BACKUP_KEY);
+      setStatus('Rolling back to v' + backup.version + '…', 'The previous version is being restored.');
+      setTimeout(reloadLaunchFile, 250);
+    } catch (err) {
+      setStatus('Rollback could not be completed.', (err && err.message) || String(err));
     }
   }
   function initUpdater() {
     if (el('updateInstalledVersion')) el('updateInstalledVersion').textContent = 'v' + APP_VERSION;
-    try {
-      var cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
-      if (cached && compareVersions(cached.version, APP_VERSION) > 0) showStaged(cached.version);
-      else {
-        if (cached && compareVersions(cached.version, APP_VERSION) < 0) localStorage.removeItem(CACHE_KEY);
-        stagedVersion = null;
-        if (el('applyUpdateBtn')) el('applyUpdateBtn').hidden = true;
-      }
-    } catch (_) {}
-    if (el('checkUpdatesBtn')) el('checkUpdatesBtn').addEventListener('click', function () { checkForUpdates(true); });
-    if (el('applyUpdateBtn')) el('applyUpdateBtn').addEventListener('click', function () {
-      if (!stagedVersion) return;
-      setStatus('Restarting to install v' + stagedVersion + '…');
-      /* Reload the original local HTML file. Its bootstrap activates the staged release. */
-      try {
-        if (window.top && window.top !== window) window.top.location.reload();
-        else location.reload();
-      } catch (_) { location.reload(); }
-    });
-    checkForUpdates(false);
-    setInterval(function () {
-      if (!document.hidden && Date.now() - lastCheckAt >= 10 * 60 * 1000) checkForUpdates(false);
-    }, 60 * 1000);
-    document.addEventListener('visibilitychange', function () {
-      if (!document.hidden && Date.now() - lastCheckAt >= 60 * 1000) checkForUpdates(false);
-    });
+    updateRollbackButton();
+    if (el('checkUpdatesBtn')) el('checkUpdatesBtn').addEventListener('click', checkForUpdates);
+    if (el('downloadUpdateBtn')) el('downloadUpdateBtn').addEventListener('click', downloadHtml);
+    if (el('patchUpdateBtn')) el('patchUpdateBtn').addEventListener('click', patchThisBrowser);
+    if (el('rollbackUpdateBtn')) el('rollbackUpdateBtn').addEventListener('click', rollback);
+    /* Intentionally no startup check, timer, or visibility-based check. */
+    setStatus('Updates are manual. Select Check for updates when you want to look for a release.', 'No update checks or downloads run in the background.');
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initUpdater, { once: true });
   else initUpdater();
