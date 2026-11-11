@@ -1,8 +1,8 @@
 {
   "app": "Party Chat",
-  "version": "1.0.1",
-  "releasedAt": "2026-11-11T14:00:00Z",
+  "version": "1.0.2",
+  "releasedAt": "2026-11-11T17:02:12Z",
   "file": "PartyChat.html",
-  "sha256": "e2fa686d5e8b6bab23c9d2a49f2d80fa020bb8938fc98fb9160d8b17ed09e99c",
-  "notes": "Adds in-app GitHub update checks, SHA-256 verification, staged installation on restart, and safe fallback when browser storage is unavailable."
+  "sha256": "38fe1983b26ffd2a49f1e1b3e77f45140dd505c0493968779e46f6b22f60f91d",
+  "notes": "Redesigned header and Settings menu, clearer display-name control, GitHub repository link, and a subtle accent-aware background gradient in light and dark modes."
 }
