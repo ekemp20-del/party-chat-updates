@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" data-partychat-version="1.0.6"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script>
+<html lang="en" data-partychat-version="1.0.7"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script>
 /* Party Chat bootstrap. Older settings/history keys are deliberately preserved. */
 (function () {
   'use strict';
-  var BASE_VERSION = '1.0.6';
+  var BASE_VERSION = '1.0.7';
   var ACTIVE_KEY = 'partychat.runtime.active.v1';
   var LEGACY_STAGE_KEY = 'partychat.update.staged.v1';
   var FRAME_NAME = 'partychat-update-runtime';
@@ -287,7 +287,7 @@ body.dark{
 }
 
 
-/* Party Chat 1.0.6 — manual updates, reversible browser patching and stronger theme gradients */
+/* Party Chat 1.0.7 — manual updates, reversible browser patching and stronger theme gradients */
 #settingsBtn.settings-trigger{
   align-self:center!important;height:44px!important;min-height:44px!important;width:auto!important;min-width:122px!important;
   flex:0 0 auto!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;
@@ -439,7 +439,7 @@ form{align-items:center!important;gap:7px!important}
   </div>
   <div class="settings-section">
     <div class="settings-section-label">APP</div>
-    <div class="settings-row"><span>Version</span><strong id="updateInstalledVersion" style="font-size:11px;font-weight:650">v1.0.6</strong></div>
+    <div class="settings-row"><span>Version</span><strong id="updateInstalledVersion" style="font-size:11px;font-weight:650">v1.0.7</strong></div>
     <div class="settings-row update-settings-row"><div style="min-width:0;flex:1"><div style="font-size:11px;font-weight:650">Software updates</div><div id="updateStatus" class="update-status" role="status" aria-live="polite">Updates are manual. Select Check for updates when you want to look for a release.</div><div id="updateLastCheck" class="update-last-check">No background checks or downloads.</div></div></div>
     <div class="settings-row update-buttons"><button type="button" id="checkUpdatesBtn" class="update-action primary">Check for updates</button></div>
     <div class="settings-row update-buttons"><button type="button" id="downloadUpdateBtn" class="update-action" hidden>Download new HTML</button><button type="button" id="patchUpdateBtn" class="update-action primary" hidden>Patch this browser</button></div>
@@ -849,6 +849,27 @@ async function verifyGifChunk(buffer,expected){
   const digest=await window.crypto.subtle.digest('SHA-256',buffer);
   return bytesToHex(digest).toLowerCase()===String(expected||'').toLowerCase();
 }
+async function fetchGithubGifChunk(chunk,index,version){
+  const maxAttempts=3;
+  let lastFailure='unknown network error';
+  for(let attempt=1;attempt<=maxAttempts;attempt++){
+    const cacheBuster=Date.now().toString(36)+'-'+index+'-'+attempt;
+    const url=GIF_LIBRARY_BASE_URL+chunk.file+'?v='+encodeURIComponent(version)+'&cacheBust='+encodeURIComponent(cacheBuster);
+    try{
+      const response=await fetch(url,{cache:'no-store',mode:'cors'});
+      if(response.ok)return response;
+      lastFailure='HTTP '+response.status;
+    }catch(err){
+      lastFailure=(err&&err.message)||'network error';
+    }
+    if(attempt<maxAttempts){
+      gifPickerStatus('Retrying the GIF library download…','Part '+(index+1)+' · attempt '+(attempt+1)+' of '+maxAttempts);
+      await new Promise(resolve=>setTimeout(resolve,350*attempt));
+    }
+  }
+  throw new Error('GIF library file '+chunk.file+' could not be downloaded after '+maxAttempts+' uncached attempts ('+lastFailure+'). Check the connection and try again.');
+}
+
 async function downloadGithubGifLibrary(){
   if(gifDownloadBusy)return;
   gifDownloadBusy=true;$('gifImportBtn').disabled=true;$('gifImportBtn').textContent='Connecting…';
@@ -876,7 +897,7 @@ async function downloadGithubGifLibrary(){
         throw new Error('A GIF library chunk entry is invalid.');
       }
       gifPickerStatus('Downloading the GIF library…','Part '+(i+1)+' of '+manifest.chunks.length+' · '+formatGifBytes(received)+' received');
-      const response=await fetch(GIF_LIBRARY_BASE_URL+chunk.file+'?v='+encodeURIComponent(manifest.version),{cache:'force-cache',mode:'cors'});
+      const response=await fetchGithubGifChunk(chunk,i,manifest.version);
       if(!response.ok)throw new Error('GIF library file '+chunk.file+' is not available on GitHub yet (HTTP '+response.status+').');
       const data=await response.arrayBuffer();
       if(data.byteLength!==chunk.bytes)throw new Error('The downloaded size of '+chunk.file+' did not match the manifest.');
@@ -1176,7 +1197,7 @@ setInterval(()=>{if($('peoplePanel').classList.contains('open')){renderPeoplePan
   'use strict';
   if (window.__PARTYCHAT_BOOTSTRAP_ONLY__) return;
 
-  var APP_VERSION = '1.0.6';
+  var APP_VERSION = '1.0.7';
   var MANIFEST_URL = 'https://raw.githubusercontent.com/ekemp20-del/party-chat-updates/main/manifest.json';
   var BASE_URL = 'https://raw.githubusercontent.com/ekemp20-del/party-chat-updates/main/';
   var ACTIVE_KEY = 'partychat.runtime.active.v1';
