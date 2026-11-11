@@ -1,8 +1,8 @@
 {
   "app": "Party Chat",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "releasedAt": "2026-11-11",
   "file": "PartyChat.html",
-  "sha256": "e8f8004375a39bc405cf9bdac1df85932e06390df00edfa3c9683117c1b15d9a",
-  "notes": "Adds an offline GIF/sticker picker. Users import the ZIP library once per browser; messages send stable asset IDs through the existing WebSocket instead of retransmitting GIF files. Includes animated previews, search, GIF/sticker tabs and missing-pack detection. Moves the photo, camera and more-options controls outside the message field while retaining their composer positions."
+  "sha256": "392ec02d2a4b91db629dd85b9d66eaba6a7d1afaed144b1a3ee0e9892a7738f3",
+  "notes": "Replaces manual ZIP selection with one-click GitHub-hosted GIF library download, verified chunk-by-chunk and stored for offline use. Unifies GIF, photo, camera and plus controls with the message field's height, background, border and capsule radius."
 }
