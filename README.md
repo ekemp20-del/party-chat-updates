@@ -1,32 +1,29 @@
 # Party Chat update repository
 
-This public repository hosts the official Party Chat HTML releases and update manifest. GitHub is used only to distribute application updates; chat messages, images, presence and other live traffic continue to use the existing Party Chat WebSocket relay.
+The official public release and update manifest for Party Chat.
 
-## Release files
+## Current release: 1.0.2
 
-- `PartyChat.html` — complete self-contained application.
-- `manifest.json` — current version, release filename and SHA-256 checksum.
-- `changelog.txt` — human-readable release notes.
+- `PartyChat.html` — complete self-contained app.
+- `manifest.json` — current version and SHA-256 checksum.
+- `changelog.txt` — release notes.
 
 ## Update endpoints
 
-The app reads these public raw-file URLs:
+- Manifest: https://raw.githubusercontent.com/ekemp20-del/party-chat-updates/main/manifest.json
+- App: https://raw.githubusercontent.com/ekemp20-del/party-chat-updates/main/PartyChat.html
 
-- https://raw.githubusercontent.com/ekemp20-del/party-chat-updates/main/manifest.json
-- https://raw.githubusercontent.com/ekemp20-del/party-chat-updates/main/PartyChat.html
+GitHub only distributes application updates. Chat messages, presence and images continue to use the existing Party Chat WebSocket relay.
 
-No GitHub account or token is required on users' devices.
+## How client updates work
 
-## How updates work
+Party Chat checks the public manifest at startup and periodically while open. It downloads a newer HTML build, checks its version marker and SHA-256 checksum, and stages the verified build in browser storage. Users restart Party Chat to apply it, so an active conversation is not interrupted.
 
-Party Chat checks the manifest at startup and periodically while open. When a newer version is available, it downloads the HTML, validates the version marker and SHA-256 checksum, then stages the verified HTML in browser storage. Users restart Party Chat to activate it, avoiding interruption to active conversations.
+A browser HTML file cannot overwrite its own original local file in the normal sandbox. The updated build is therefore launched from browser storage on subsequent launches. Users should continue opening the same original HTML file. If browser storage is unavailable or disabled, the local version remains available and the app continues to run.
 
-Because a normal local HTML file cannot overwrite itself, the local file acts as a bootstrap. The verified newer HTML is loaded from browser storage on the next launch. Browser settings that disable local storage may prevent staged updates from being applied.
+## Publishing a new release
 
-## Publishing a release
-
-1. Replace `PartyChat.html` with the complete new application build.
-2. Update `manifest.json` with the new version and the SHA-256 checksum of the exact UTF-8 file bytes.
-3. Commit both files to the `main` branch. Update `changelog.txt` with the release notes.
-
-Keep the repository public so clients can fetch updates without credentials.
+1. Replace `PartyChat.html` with the full new app build.
+2. Update the version marker in the document, update bootstrap, and updater code.
+3. Recalculate the SHA-256 checksum of the exact UTF-8 `PartyChat.html` file and update `manifest.json`.
+4. Update `changelog.txt` and commit the HTML first, then the manifest.
