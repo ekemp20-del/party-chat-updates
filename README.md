@@ -20,7 +20,7 @@ Before patching, Party Chat saves the currently running HTML as a previous-versi
 
 ## Migration from earlier versions
 
-The v1.0.4 bootstrap removes only the obsolete staging key from previous automatic updaters. Existing display name, theme, dark mode, message history and other user data are deliberately kept. Users should replace their local HTML with v1.0.4 once to receive the manual update interface and migration logic.
+The v1.0.4 bootstrap removes only the obsolete staging key from previous automatic updaters. Existing display name, theme, dark mode, message history and other user data are deliberately kept. Users should replace their existing PartyChat.html with v1.0.4 once, overwriting it in the same folder with the same filename. Keeping the same file path is important because browser storage for a local HTML app can be associated with that file location; saving it as a different filename may make the old name, theme and history appear to be missing. This one-time replacement installs the new manual update interface and migration logic.
 
 ## Publishing a release
 
