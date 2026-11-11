@@ -1,0 +1,6 @@
+Party Chat 1.0.1 — 11 November 2026
+
+- Adds automatic update checks against the Party Chat GitHub release manifest.
+- Verifies downloaded releases using SHA-256 before staging them.
+- Applies updates after restart instead of interrupting an active conversation.
+- Keeps the existing WebSocket messaging, image transfer and in-chat camera implementation.
