@@ -1,8 +1,8 @@
 {
   "app": "Party Chat",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "releasedAt": "2026-11-11",
   "file": "PartyChat.html",
-  "sha256": "0863b7ca66b9d2db0adf3ccd54fe84fdc6ea621d5fdea1ce77e949d8ad4674ed",
-  "notes": "Fixes duplicate app rendering during staged updates; restores the original P logo; makes the U+2699 Settings gear a full-height header control with a small caption; increases spacing before the display-name field; clears stale staged updates and reports when up to date."
+  "sha256": "9306a74805c1ff099f961e161c9a3fdfe280b631d2cdbffb7f5e8039f7a1269e",
+  "notes": "Moves all updates to a manual Settings action; offers Download HTML or Patch this browser; saves a previous-version backup and provides rollback; migrates existing users while preserving their names, themes and chat history; changes Settings to a rounded inline U+2261 button; strengthens gradients for non-default colours."
 }
