@@ -3,6 +3,6 @@
   "version": "1.0.2",
   "releasedAt": "2026-11-11T17:02:12Z",
   "file": "PartyChat.html",
-  "sha256": "38fe1983b26ffd2a49f1e1b3e77f45140dd505c0493968779e46f6b22f60f91d",
+  "sha256": "24d2806a0c08806f9de36d65b788ff692840cfe352c4bedb7196393b0ba06156",
   "notes": "Redesigned header and Settings menu, clearer display-name control, GitHub repository link, and a subtle accent-aware background gradient in light and dark modes."
 }
