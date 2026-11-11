@@ -1,0 +1,8 @@
+{
+  "app": "Party Chat",
+  "version": "1.0.1",
+  "releasedAt": "2026-11-11T14:00:00Z",
+  "file": "PartyChat.html",
+  "sha256": "e2fa686d5e8b6bab23c9d2a49f2d80fa020bb8938fc98fb9160d8b17ed09e99c",
+  "notes": "Adds in-app GitHub update checks, SHA-256 verification, staged installation on restart, and safe fallback when browser storage is unavailable."
+}
