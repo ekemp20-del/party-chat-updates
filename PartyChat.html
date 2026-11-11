@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" data-partychat-version="1.0.2"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script>
+<html lang="en" data-partychat-version="1.0.3"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script>
 /* Party Chat update bootstrap. Keep this in every published build. */
 (function () {
   'use strict';
-  var CURRENT_VERSION = '1.0.2';
+  var CURRENT_VERSION = '1.0.3';
   var CACHE_KEY = 'partychat.update.staged.v1';
   function compareVersions(a, b) {
     var aa = String(a).split('.').map(function (x) { return parseInt(x, 10) || 0; });
@@ -21,16 +21,29 @@
     if (!staged || !staged.version || typeof staged.html !== 'string') {
       localStorage.removeItem(CACHE_KEY); return;
     }
-    if (compareVersions(staged.version, CURRENT_VERSION) <= 0) {
+    if (compareVersions(staged.version, CURRENT_VERSION) < 0) {
       localStorage.removeItem(CACHE_KEY); return;
     }
     var marker = 'data-partychat-version="' + staged.version + '"';
     if (staged.html.indexOf(marker) === -1 || staged.html.indexOf('<title>Party Chat</title>') === -1) {
       localStorage.removeItem(CACHE_KEY); return;
     }
-    document.open();
-    document.write(staged.html);
-    document.close();
+    /*
+       Do not use document.write here. When the updater runs from a script in the
+       original file's <head>, the original HTML parser can resume after document.write
+       and append a second copy of the app. Instead, display the verified release in a
+       full-viewport srcdoc frame. srcdoc inherits this local file's origin, so the app
+       keeps access to the same localStorage, camera permissions and WebSocket APIs.
+       Keep the staged release in storage: the user's original HTML file is not
+       overwritten, so this cached release must remain available on every launch.
+    */
+    var frame = document.createElement('iframe');
+    frame.title = 'Party Chat';
+    frame.setAttribute('allow', 'camera; microphone; clipboard-read; clipboard-write');
+    frame.setAttribute('referrerpolicy', 'no-referrer');
+    frame.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;display:block;border:0;margin:0;padding:0;z-index:2147483647;background:var(--bg,#f2f2f7);';
+    frame.srcdoc = staged.html;
+    document.documentElement.appendChild(frame);
   } catch (e) {
     /* Storage can be disabled for some file:// configurations; keep the local build running. */
   }
@@ -124,7 +137,7 @@ body.dark:not(.theme-blue):not(.theme-green):not(.theme-purple):not(.theme-red):
 .camera-actions button:disabled{opacity:.5;cursor:wait}
 @media(max-width:520px){.camera-modal{padding:8px}.camera-card{padding:11px;border-radius:15px;gap:10px;max-height:calc(100dvh - 16px)}.camera-stage{aspect-ratio:3/4;max-height:58vh}.camera-actions button{padding:0 11px}}
 
-/* Party Chat 1.0.2 — refined header, consolidated settings and adaptive chat backdrop */
+/* Party Chat 1.0.3 — fix update activation and refine header controls */
 body{
   --chat-gradient-a:color-mix(in srgb,var(--accent) 13%,var(--bg));
   --chat-gradient-b:color-mix(in srgb,var(--accent) 6%,var(--bg));
@@ -149,10 +162,10 @@ body.dark{
 #name{width:205px;height:38px;border:1px solid var(--border);border-radius:11px;padding:0 12px;font-size:13px;font-weight:550}
 #name::placeholder{color:var(--muted);opacity:.85}
 #people{font-size:11px}
-#settingsBtn.settings-trigger{height:42px;min-width:104px;width:auto;display:flex;align-items:center;justify-content:center;gap:9px;padding:0 13px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text);font-size:12px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.045);transition:background .15s,border-color .15s,transform .15s}
-#settingsBtn.settings-trigger svg{width:18px;height:18px;color:var(--accent)}
-#settingsBtn.settings-trigger:hover,#settingsBtn.settings-trigger[aria-expanded="true"]{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 40%,var(--border))}
-#settingsBtn.settings-trigger:active{transform:scale(.97)}
+.settings-trigger{height:42px;min-width:104px;display:flex;align-items:center;justify-content:center;gap:9px;padding:0 13px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text);font-size:12px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.045);transition:background .15s,border-color .15s,transform .15s}
+.settings-trigger svg{width:18px;height:18px;color:var(--accent)}
+.settings-trigger:hover,.settings-trigger[aria-expanded="true"]{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 40%,var(--border))}
+.settings-trigger:active{transform:scale(.97)}
 .settings-popover{top:72px;right:16px;width:min(340px,calc(100vw - 20px));max-height:calc(100dvh - 88px);overflow-y:auto;padding:15px;border-radius:17px}
 .settings-title{font-size:16px;letter-spacing:-.02em;margin:1px 0 12px}
 .settings-section{padding:11px 0;border-top:1px solid var(--border)}
@@ -181,8 +194,8 @@ body.dark{
   .utility{gap:9px}
   #namebar{padding-left:10px}
   #name{width:150px}
-  #settingsBtn.settings-trigger{min-width:42px;width:42px;padding:0}
-  #settingsBtn.settings-trigger span{display:none}
+  .settings-trigger{min-width:42px;width:42px;padding:0}
+  .settings-trigger span{display:none}
 }
 @media(max-width:520px){
   header{padding:0 9px;gap:6px}
@@ -197,7 +210,7 @@ body.dark{
   .name-controls{gap:0}
   #name{width:122px;height:34px;font-size:12px;padding:0 9px}
   #people{display:none}
-  #settingsBtn.settings-trigger{height:38px;width:38px;min-width:38px;border-radius:11px}
+  .settings-trigger{height:38px;width:38px;min-width:38px;border-radius:11px}
   .settings-popover{top:58px;right:9px;width:min(340px,calc(100vw - 18px));max-height:calc(100dvh - 70px)}
 }
 @media(max-width:365px){
@@ -207,16 +220,56 @@ body.dark{
   .utility{gap:5px}
 }
 
+
+/* Party Chat 1.0.3 header corrections */
+.brand-mark{
+  width:36px;height:36px;flex:0 0 36px;border-radius:11px;
+  background:var(--accent);display:grid;place-items:center;color:#fff;
+  font-weight:800;font-size:18px;box-shadow:0 4px 14px rgba(10,132,255,.22);
+}
+.brand-mark svg{display:none}
+.utility{gap:0}
+#namebar{margin-right:22px}
+#settingsBtn.settings-trigger{
+  align-self:stretch;height:64px;min-height:64px;width:76px;min-width:76px;flex:0 0 76px;
+  margin:0;padding:3px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0;border:0;border-left:1px solid var(--border);border-radius:0;
+  background:transparent;color:var(--text);box-shadow:none;
+}
+#settingsBtn.settings-trigger .settings-gear{
+  display:block!important;height:40px;line-height:40px;font-family:"Segoe UI Symbol","Noto Sans Symbols 2",sans-serif;
+  font-size:38px;font-weight:400;color:var(--accent);text-align:center;
+}
+#settingsBtn.settings-trigger .settings-caption{
+  display:block!important;font-size:9px;line-height:12px;font-weight:650;letter-spacing:.035em;color:var(--muted);
+}
+#settingsBtn.settings-trigger:hover,#settingsBtn.settings-trigger[aria-expanded="true"]{background:var(--accent-soft)}
+@media(max-width:760px){
+  .brand-mark{width:36px;height:36px;flex-basis:36px;border-radius:11px}
+  .brand-mark svg{display:none}
+  #namebar{margin-right:14px;padding-left:10px}
+  #name{width:132px}
+  #settingsBtn.settings-trigger{height:64px;min-height:64px;width:68px;min-width:68px;flex-basis:68px}
+  #settingsBtn.settings-trigger .settings-gear{font-size:34px;height:36px;line-height:36px}
+}
+@media(max-width:520px){
+  .brand-mark{width:31px;height:31px;flex-basis:31px;border-radius:9px}
+  #namebar{margin-right:9px;padding-left:7px}
+  #name{width:100px;height:34px}
+  #settingsBtn.settings-trigger{height:64px;min-height:64px;width:55px;min-width:55px;flex-basis:55px}
+  #settingsBtn.settings-trigger .settings-gear{font-size:30px;height:32px;line-height:32px}
+  #settingsBtn.settings-trigger .settings-caption{font-size:8px}
+}
+@media(max-width:365px){
+  #name{width:84px}
+  #namebar{margin-right:6px;padding-left:5px}
+  #settingsBtn.settings-trigger{width:50px;min-width:50px;flex-basis:50px}
+}
+
 </style></head><body>
 <header>
   <div class="brand">
-    <div class="brand-mark" aria-hidden="true">
-      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M6.2 8.2A3.2 3.2 0 0 1 9.4 5h13.2a3.2 3.2 0 0 1 3.2 3.2v10.1a3.2 3.2 0 0 1-3.2 3.2h-7.1l-6.2 4.2v-4.2h-.1a3.2 3.2 0 0 1-3.2-3.2V8.2Z" stroke="white" stroke-width="2.1" stroke-linejoin="round"/>
-        <path d="m16 8.4 1.25 3.8 3.8 1.25-3.8 1.25L16 18.5l-1.25-3.8-3.8-1.25 3.8-1.25L16 8.4Z" fill="white"/>
-        <path d="m25.9 3 .55 1.7 1.7.55-1.7.55-.55 1.7-.55-1.7-1.7-.55 1.7-.55.55-1.7Z" fill="white"/>
-      </svg>
-    </div>
+    <div class="brand-mark" aria-hidden="true">P</div>
     <div class="brand-text"><div id="title">Party Chat</div><div class="subtitle">Public room</div><div id="status">Connecting…</div></div>
   </div>
   <div class="utility">
@@ -225,8 +278,8 @@ body.dark{
       <div class="name-controls"><input id="name" maxlength="24" placeholder="Enter your name" autocomplete="off"><span id="people">0 online</span></div>
     </div>
     <button id="settingsBtn" class="settings-trigger" type="button" title="Open settings" aria-label="Open settings" aria-haspopup="true" aria-expanded="false">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8.4a3.6 3.6 0 1 0 0 7.2 3.6 3.6 0 0 0 0-7.2Z"/><path d="m19.4 13.5 1.1.9-1.2 2.1-1.4-.5a7.9 7.9 0 0 1-1.5.9l-.2 1.5h-2.4l-.4-1.4a7.5 7.5 0 0 1-1.7 0l-.8 1.2-2.1-1.2.5-1.4a7.9 7.9 0 0 1-.9-1.5l-1.5-.2v-2.4l1.4-.4a7.5 7.5 0 0 1 0-1.7l-1.2-.8 1.2-2.1 1.4.5a7.9 7.9 0 0 1 1.5-.9l.2-1.5h2.4l.4 1.4a7.5 7.5 0 0 1 1.7 0l.8-1.2 2.1 1.2-.5 1.4a7.9 7.9 0 0 1 .9 1.5l1.5.2v2.4l-1.4.4a7.5 7.5 0 0 1 0 1.7Z" transform="translate(-1 -1)"/></svg>
-      <span>Settings</span>
+      <span class="settings-gear" aria-hidden="true">&#x2699;&#xFE0E;</span>
+      <span class="settings-caption">Settings</span>
     </button>
   </div>
 </header>
@@ -247,7 +300,7 @@ body.dark{
   </div>
   <div class="settings-section">
     <div class="settings-section-label">APP</div>
-    <div class="settings-row"><span>Version</span><strong id="updateInstalledVersion" style="font-size:11px;font-weight:650">v1.0.2</strong></div>
+    <div class="settings-row"><span>Version</span><strong id="updateInstalledVersion" style="font-size:11px;font-weight:650">v1.0.3</strong></div>
     <div class="settings-row update-settings-row"><div style="min-width:0;flex:1"><div style="font-size:11px;font-weight:650">Software updates</div><div id="updateStatus" class="update-status" role="status" aria-live="polite">Automatic update checks are enabled.</div><div id="updateLastCheck" class="update-last-check">Not checked yet</div></div></div>
     <div class="settings-row update-buttons"><button type="button" id="checkUpdatesBtn" class="update-action">Check now</button><button type="button" id="applyUpdateBtn" class="update-action primary" hidden>Restart to update</button></div>
     <div class="settings-row"><span>Image quality</span><strong style="font-size:11px;font-weight:650">Automatic · maximum</strong></div>
@@ -286,7 +339,7 @@ body.dark{
 const ROUTER='wss://router.metapage.io/';
 const CHANNEL='public-chat-v1';
 const LEGACY_BRIDGE='https://ntfy.sh/party-chat-ie11-7x4p92qk-v1';
-let ws=null,name=localStorage.getItem('simplechat-name')||'',avatar='😀',clientId=sessionStorage.getItem('simplechat-client-id')||crypto.randomUUID();sessionStorage.setItem('simplechat-client-id',clientId);
+let ws=null,name=localStorage.getItem('simplechat-name')||'',avatar='😀',clientId=sessionStorage.getItem('simplechat-client-id')||crypto.randomUUID();if(/^v?\d+\.\d+\.\d+$/.test(name)){name='';localStorage.removeItem('simplechat-name')}sessionStorage.setItem('simplechat-client-id',clientId);
 const members=new Map();let memberTimer=null;const typingUsers=new Map();let replyTo=null;const HISTORY_KEY='simplechat-history-v2';
 const network={started:Date.now(),reconnects:0,msgs:0,events:0,lastEvent:Date.now(),rtt:[],lastHeartbeat:0};
 const diag={timeline:[],latencyByClient:new Map(),sentAt:new Map(),delivered:0,deliveryTotal:0,seen:0,seenTotal:0,packetTests:[],stress:0,incident:[],eventCounts:{},population:[],messageAcks:new Map(),fps:60,fpsFrames:0,fpsLast:performance.now()};
@@ -708,7 +761,7 @@ setInterval(()=>{if($('peoplePanel').classList.contains('open')){renderPeoplePan
    continues to use the existing WebSocket relay and is never routed through GitHub. */
 (function () {
   'use strict';
-  var APP_VERSION = '1.0.2';
+  var APP_VERSION = '1.0.3';
   var MANIFEST_URL = 'https://raw.githubusercontent.com/ekemp20-del/party-chat-updates/main/manifest.json';
   var BASE_URL = 'https://raw.githubusercontent.com/ekemp20-del/party-chat-updates/main/';
   var CACHE_KEY = 'partychat.update.staged.v1';
@@ -756,8 +809,14 @@ setInterval(()=>{if($('peoplePanel').classList.contains('open')){renderPeoplePan
       if (compareVersions(manifest.version, APP_VERSION) <= 0) {
         var prior = null;
         try { prior = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); } catch (_) {}
-        if (prior && compareVersions(prior.version, APP_VERSION) > 0) showStaged(prior.version);
-        else setStatus('You are up to date · v' + APP_VERSION, 'Last checked · ' + new Date().toLocaleString());
+        if (prior && compareVersions(prior.version, APP_VERSION) > 0) {
+          showStaged(prior.version);
+        } else {
+          if (prior && compareVersions(prior.version, APP_VERSION) < 0) localStorage.removeItem(CACHE_KEY);
+          stagedVersion = null;
+          if (el('applyUpdateBtn')) el('applyUpdateBtn').hidden = true;
+          setStatus('You are up to date · v' + APP_VERSION, 'Last checked · ' + new Date().toLocaleString());
+        }
         return;
       }
       if (typeof manifest.sha256 !== 'string' || !/^[a-f0-9]{64}$/i.test(manifest.sha256)) throw new Error('The manifest is missing a valid SHA-256 checksum.');
@@ -790,13 +849,21 @@ setInterval(()=>{if($('peoplePanel').classList.contains('open')){renderPeoplePan
     try {
       var cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
       if (cached && compareVersions(cached.version, APP_VERSION) > 0) showStaged(cached.version);
+      else {
+        if (cached && compareVersions(cached.version, APP_VERSION) < 0) localStorage.removeItem(CACHE_KEY);
+        stagedVersion = null;
+        if (el('applyUpdateBtn')) el('applyUpdateBtn').hidden = true;
+      }
     } catch (_) {}
     if (el('checkUpdatesBtn')) el('checkUpdatesBtn').addEventListener('click', function () { checkForUpdates(true); });
     if (el('applyUpdateBtn')) el('applyUpdateBtn').addEventListener('click', function () {
       if (!stagedVersion) return;
       setStatus('Restarting to install v' + stagedVersion + '…');
-      /* Reload the original file; the head bootstrap swaps in the verified cached HTML. */
-      location.reload();
+      /* Reload the original local HTML file. Its bootstrap activates the staged release. */
+      try {
+        if (window.top && window.top !== window) window.top.location.reload();
+        else location.reload();
+      } catch (_) { location.reload(); }
     });
     checkForUpdates(false);
     setInterval(function () {
