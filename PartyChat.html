@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" data-partychat-version="1.0.4"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script>
+<html lang="en" data-partychat-version="1.0.5"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script>
 /* Party Chat bootstrap. Older settings/history keys are deliberately preserved. */
 (function () {
   'use strict';
-  var BASE_VERSION = '1.0.4';
+  var BASE_VERSION = '1.0.5';
   var ACTIVE_KEY = 'partychat.runtime.active.v1';
   var LEGACY_STAGE_KEY = 'partychat.update.staged.v1';
   var FRAME_NAME = 'partychat-update-runtime';
@@ -287,7 +287,7 @@ body.dark{
 }
 
 
-/* Party Chat 1.0.4 — manual updates, reversible browser patching and stronger theme gradients */
+/* Party Chat 1.0.5 — manual updates, reversible browser patching and stronger theme gradients */
 #settingsBtn.settings-trigger{
   align-self:center!important;height:44px!important;min-height:44px!important;width:auto!important;min-width:122px!important;
   flex:0 0 auto!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;
@@ -342,6 +342,42 @@ body.dark.theme-blue #messages,body.dark.theme-green #messages,body.dark.theme-p
   background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 17%,transparent),transparent 48%,color-mix(in srgb,var(--accent) 10%,transparent));
 }
 
+
+/* Built-in offline GIF and sticker library */
+.gif-picker{display:none;position:fixed;left:max(12px,calc((100vw - 920px)/2));bottom:82px;width:min(520px,calc(100vw - 24px));max-height:min(62vh,570px);flex-direction:column;gap:10px;padding:13px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:17px;box-shadow:var(--shadow);z-index:160}
+.gif-picker.open{display:flex}
+.gif-picker-head,.gif-picker-controls{display:flex;align-items:center;gap:9px}
+.gif-picker-head>div{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.gif-picker-head strong{font-size:14px;letter-spacing:-.02em}
+.gif-picker-head small{font-size:10px;color:var(--muted)}
+.gif-picker-head button,.gif-import-btn{height:31px;padding:0 10px;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);color:var(--text);font-size:10px;font-weight:650}
+.gif-picker-controls{justify-content:space-between}
+.gif-tabs{display:flex;gap:4px;padding:3px;border-radius:10px;background:var(--surface-2)}
+.gif-tabs button{height:29px;padding:0 11px;border:0;border-radius:7px;background:transparent;color:var(--muted);font-size:10px;font-weight:700}
+.gif-tabs button.active{background:var(--surface);color:var(--text);box-shadow:0 1px 3px #0002}
+.gif-search{width:100%;height:35px;padding:0 11px;border:1px solid var(--border);border-radius:10px;background:var(--surface-2);color:var(--text);font-size:12px;outline:0}
+.gif-search:focus{border-color:var(--accent)}
+.gif-import-status{padding:7px 9px;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);color:var(--muted);font-size:10px;line-height:1.4}
+.gif-import-status[hidden]{display:none}
+.gif-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;min-height:80px;overflow:auto;padding:1px 3px 3px 1px}
+.gif-card{display:flex;min-width:0;flex-direction:column;gap:5px;padding:6px;border:1px solid var(--border);border-radius:11px;background:var(--surface-2);color:var(--text);text-align:left;transition:border-color .15s,background .15s,transform .15s}
+.gif-card:hover{border-color:var(--accent);background:var(--accent-soft);transform:translateY(-1px)}
+.gif-card img,.gif-card .gif-thumb-empty{display:grid;width:100%;height:82px;place-items:center;object-fit:contain;border-radius:7px;background:var(--surface-3);color:var(--muted);font-size:23px}
+.gif-card-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;font-weight:650}
+.gif-card-category{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.gif-empty{grid-column:1/-1;display:flex;min-height:105px;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:15px;text-align:center;color:var(--muted);font-size:11px}
+.gif-empty strong{color:var(--text);font-size:12px}
+.gif-empty button{padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:10px;font-weight:650}
+.gif-picker-btn{display:grid;place-items:center;flex:0 0 35px;width:35px;height:34px;margin-left:2px;border:1px solid var(--border);border-radius:10px;background:var(--surface-2);color:var(--text);font-size:10px;font-weight:850;letter-spacing:-.04em}
+.gif-picker-btn:hover,.gif-picker-btn[aria-expanded="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.gif-message-loading,.gif-message-missing{display:flex;min-width:150px;min-height:70px;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:12px;color:var(--muted);font-size:10px}
+.gif-message-missing{background:var(--surface-2);border-radius:9px}
+.gif-message-missing button{padding:6px 9px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:10px;font-weight:650}
+.gif-message-content{display:block}
+.message-gif{display:block;width:auto;height:auto;max-width:min(320px,65vw);max-height:300px;object-fit:contain;border-radius:11px;cursor:zoom-in;background:var(--surface-3)}
+.gif-caption{padding:6px 7px 3px;font-size:12px;line-height:1.35;white-space:pre-wrap;overflow-wrap:anywhere}
+@media(max-width:520px){.gif-picker{left:8px;bottom:76px;width:calc(100vw - 16px);max-height:58vh;padding:10px}.gif-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.gif-card img,.gif-card .gif-thumb-empty{height:70px}.gif-picker-btn{flex-basis:32px;width:32px;height:32px;font-size:9px}.image-attach-btn{flex-basis:30px;width:30px;height:32px;margin-left:0}#toolsBtn{width:30px;height:32px}form{gap:4px}.compose-shell{min-width:65px;padding-left:10px;padding-right:5px}form>button[type=submit]{min-width:54px;padding:0 12px}}
+
 </style></head><body>
 <header>
   <div class="brand">
@@ -376,7 +412,7 @@ body.dark.theme-blue #messages,body.dark.theme-green #messages,body.dark.theme-p
   </div>
   <div class="settings-section">
     <div class="settings-section-label">APP</div>
-    <div class="settings-row"><span>Version</span><strong id="updateInstalledVersion" style="font-size:11px;font-weight:650">v1.0.4</strong></div>
+    <div class="settings-row"><span>Version</span><strong id="updateInstalledVersion" style="font-size:11px;font-weight:650">v1.0.5</strong></div>
     <div class="settings-row update-settings-row"><div style="min-width:0;flex:1"><div style="font-size:11px;font-weight:650">Software updates</div><div id="updateStatus" class="update-status" role="status" aria-live="polite">Updates are manual. Select Check for updates when you want to look for a release.</div><div id="updateLastCheck" class="update-last-check">No background checks or downloads.</div></div></div>
     <div class="settings-row update-buttons"><button type="button" id="checkUpdatesBtn" class="update-action primary">Check for updates</button></div>
     <div class="settings-row update-buttons"><button type="button" id="downloadUpdateBtn" class="update-action" hidden>Download new HTML</button><button type="button" id="patchUpdateBtn" class="update-action primary" hidden>Patch this browser</button></div>
@@ -396,12 +432,13 @@ body.dark.theme-blue #messages,body.dark.theme-green #messages,body.dark.theme-p
 <div id="debugPanel" class="debug-panel"><div class="debug-head"><strong>DIAGNOSTICS</strong><button id="debugClear">Clear</button><button id="debugCopy">Copy log</button><button id="debugClose" class="panel-close">✕ Close</button><span id="debugStats" class="debug-stats">0 events</span></div><div class="network-lab"><div class="net-card"><div class="net-label">WebSocket</div><div class="net-value" id="netState">—</div></div><div class="net-card"><div class="net-label">Uptime</div><div class="net-value" id="netUptime">—</div></div><div class="net-card"><div class="net-label">Messages</div><div class="net-value" id="netMessages">0</div></div><div class="net-card"><div class="net-label">Events / sec</div><div class="net-value" id="netRate">0</div></div><div class="net-card"><div class="net-label">Delivery RTT</div><div class="net-value" id="netRtt">—</div></div><div class="net-card"><div class="net-label">Reconnects</div><div class="net-value" id="netReconnects">0</div></div><div class="net-card"><div class="net-label">Last heartbeat</div><div class="net-value" id="netHeartbeat">—</div></div><div class="net-card"><div class="net-label">Local history</div><div class="net-value" id="netHistory">0</div></div><div class="net-card net-peers"><div class="net-label">Connected clients</div><div id="netPeers"></div></div><div class="net-card"><div class="net-label">FPS</div><div class="net-value" id="netFps">—</div></div><div class="net-card"><div class="net-label">DOM nodes</div><div class="net-value" id="netDom">—</div></div><div class="net-card"><div class="net-label">Traffic</div><div class="net-value" id="netTraffic">—</div></div><div class="net-card"><div class="net-label">Delivery</div><div class="net-value" id="netDelivery">—</div></div><div class="net-card net-peers"><div class="net-label">Event breakdown</div><div id="netBreakdown" class="diag-breakdown"></div></div><div class="net-card net-peers"><div class="net-label">Population history</div><div id="netPopulation" class="diag-bars"></div></div><div class="net-card net-peers"><div class="net-label">Message acknowledgements</div><div id="netAcks" class="diag-acks"></div></div><div class="net-card net-peers"><div class="net-label">Diagnostics tools</div><div class="diag-tools"><button id="diagPing">Ping room</button><button id="diagStress">Stress test</button><button id="diagPacket">Packet test</button><button id="diagDisconnect">Simulate disconnect</button><button id="diagIncident">Save incident report</button><button id="diagExport">Export diagnostics</button></div><div id="diagResult" class="diag-result">Ready.</div></div></div><div id="debugLog" class="debug-log"></div></div>
 
 <div id="messages"></div>
-<div id="about"><div class="about-box"><button class="about-close" id="aboutClose">Close</button><h2>About Party Chat</h2><p>Party Chat is a browser-based public chat room designed to let people join without an account or app installation.</p><p>Your browser connects to the existing encrypted WebSocket relay. Text, replies, reactions, presence, polls, countdowns, whiteboard events and images are sent through that same connection to other people in the room.</p><p>Images are prepared locally at the highest practical quality that fits the WebSocket frame limit. They are not uploaded to an image-hosting service, and the encoded data is never shown as chat text.</p><p>Your chosen name and local chat history are stored only in this browser.</p></div></div>
+<div id="about"><div class="about-box"><button class="about-close" id="aboutClose">Close</button><h2>About Party Chat</h2><p>Party Chat is a browser-based public chat room designed to let people join without an account or app installation.</p><p>Your browser connects to the existing encrypted WebSocket relay. Text, replies, reactions, presence, polls, countdowns, whiteboard events, images and GIF/sticker IDs are sent through that same connection to other people in the room.</p><p>Images are prepared locally at the highest practical quality that fits the WebSocket frame limit. GIFs and stickers are selected from an offline library stored in this browser; only a small asset ID is sent through the room, not the GIF file itself.</p><p>Your chosen name and local chat history are stored only in this browser.</p></div></div>
 <div class="typing-wrap"><div id="typing" class="typing-bubble"></div></div>
 <div class="members-bar"><span class="members-label">ONLINE</span><div id="memberList" class="member-list"></div></div>
 <div id="replyPreview" class="reply-preview"><span id="replyText"></span><button id="cancelReply">Cancel</button></div>
 <div id="imagePreviewPanel" class="image-preview-panel" aria-live="polite"><img id="imagePreviewThumb" alt="Selected image preview"><div class="image-preview-details"><strong id="imagePreviewName">Image selected</strong><span id="imagePreviewStatus">Ready to send</span></div><div class="image-preview-actions"><button type="button" id="imageCancelBtn" class="image-cancel-btn">Cancel</button><button type="button" id="imageSendBtn" class="image-send-btn">Send image</button></div></div>
-<form id="form"><div class="compose-shell"><input id="text" maxlength="1000" autocomplete="off" placeholder="Message…"><button type="button" id="imageBtn" class="image-attach-btn" title="Send a photo" aria-label="Send a photo"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.25" y="4.25" width="17.5" height="15.5" rx="2.25"></rect><circle cx="8.5" cy="9" r="1.5"></circle><path d="m4.5 17 5-5 3.1 3.1 2.4-2.4 4.5 4.5"></path></svg></button><input id="imageFileInput" type="file" accept="image/*" hidden><button type="button" id="cameraBtn" class="image-attach-btn camera-attach-btn" title="Take a photo" aria-label="Take a photo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5h3l1.4-2h7.2l1.4 2h3A1.5 1.5 0 0 1 21.5 9v9A1.5 1.5 0 0 1 20 19.5H4A1.5 1.5 0 0 1 2.5 18V9A1.5 1.5 0 0 1 4 7.5Z"></path><circle cx="12" cy="13.2" r="3.6"></circle></svg></button><input id="cameraFallbackInput" type="file" accept="image/*" capture="environment" hidden><div class="tools-wrap"><button type="button" id="toolsBtn" title="More options">＋</button><div id="toolsPanel" class="tools-panel"><h3>More from Party Chat</h3><div class="tools-grid"><button type="button" id="tempBtn">Temporary message</button><button type="button" id="pollBtn">Create a poll</button><button type="button" id="countBtn">Countdown</button><button type="button" id="boardBtn">Shared whiteboard</button></div><div class="tool-section"><label>Temporary message duration</label><select id="tempDuration"><option value="10000">10 seconds</option><option value="30000">30 seconds</option><option value="60000">1 minute</option><option value="300000">5 minutes</option></select></div></div></div></div><button type="submit">Send</button></form>
+<form id="form"><div class="compose-shell"><input id="text" maxlength="1000" autocomplete="off" placeholder="Message…"></div><button type="button" id="imageBtn" class="image-attach-btn" title="Send a photo" aria-label="Send a photo"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.25" y="4.25" width="17.5" height="15.5" rx="2.25"></rect><circle cx="8.5" cy="9" r="1.5"></circle><path d="m4.5 17 5-5 3.1 3.1 2.4-2.4 4.5 4.5"></path></svg></button><input id="imageFileInput" type="file" accept="image/*" hidden><button type="button" id="cameraBtn" class="image-attach-btn camera-attach-btn" title="Take a photo" aria-label="Take a photo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5h3l1.4-2h7.2l1.4 2h3A1.5 1.5 0 0 1 21.5 9v9A1.5 1.5 0 0 1 20 19.5H4A1.5 1.5 0 0 1 2.5 18V9A1.5 1.5 0 0 1 4 7.5Z"></path><circle cx="12" cy="13.2" r="3.6"></circle></svg></button><input id="cameraFallbackInput" type="file" accept="image/*" capture="environment" hidden><button type="button" id="gifBtn" class="gif-picker-btn" title="GIFs and stickers" aria-label="Open GIFs and stickers" aria-expanded="false">GIF</button><div class="tools-wrap"><button type="button" id="toolsBtn" title="More options">＋</button><div id="toolsPanel" class="tools-panel"><h3>More from Party Chat</h3><div class="tools-grid"><button type="button" id="tempBtn">Temporary message</button><button type="button" id="pollBtn">Create a poll</button><button type="button" id="countBtn">Countdown</button><button type="button" id="boardBtn">Shared whiteboard</button></div><div class="tool-section"><label>Temporary message duration</label><select id="tempDuration"><option value="10000">10 seconds</option><option value="30000">30 seconds</option><option value="60000">1 minute</option><option value="300000">5 minutes</option></select></div></div></div><button type="submit">Send</button></form>
+<div id="gifPicker" class="gif-picker" role="dialog" aria-label="GIF and sticker library" aria-hidden="true"><div class="gif-picker-head"><div><strong>GIFs &amp; Stickers</strong><small id="gifPackStatus">No offline library installed yet.</small></div><button type="button" id="gifClose" aria-label="Close GIF picker">✕</button></div><div class="gif-picker-controls"><div class="gif-tabs"><button type="button" id="gifTabGifs" class="active" aria-pressed="true">GIFs <span id="gifCount">0</span></button><button type="button" id="gifTabStickers" aria-pressed="false">Stickers <span id="stickerCount">0</span></button></div><button type="button" id="gifImportBtn" class="gif-import-btn">Import / replace pack</button></div><input id="gifSearch" class="gif-search" type="search" placeholder="Search your GIFs…" autocomplete="off" aria-label="Search GIFs and stickers"><div id="gifImportStatus" class="gif-import-status" role="status" aria-live="polite" hidden></div><div id="gifGrid" class="gif-grid"></div></div><input id="gifPackInput" type="file" accept=".zip,application/zip" hidden>
 <div id="profilePop" class="profile-pop"></div>
 <div id="whiteboard"><div class="whiteboard-box"><div class="whiteboard-head"><div><strong>Shared whiteboard</strong><div class="whiteboard-note">Everyone needs to have the whiteboard open to see the live drawing.</div></div><button id="clearBoard">Clear</button><button id="closeBoard">Close</button></div><div class="whiteboard-canvas-wrap"><canvas id="boardCanvas" class="whiteboard-canvas"></canvas><div id="cursorLayer" class="cursor-layer"></div></div></div></div>
 <div id="cameraModal" class="camera-modal" role="dialog" aria-modal="true" aria-labelledby="cameraTitle" aria-hidden="true">
@@ -616,6 +653,205 @@ function renderImageInBubble(message,bubble){
 function openImageViewer(src){$('imageViewerImage').src=src;$('imageViewer').classList.add('open')}
 function closeImageViewer(){$('imageViewer').classList.remove('open');$('imageViewerImage').removeAttribute('src')}
 $('imageViewerClose').onclick=closeImageViewer;$('imageViewer').addEventListener('click',e=>{if(e.target===$('imageViewer'))closeImageViewer()});
+
+// Offline GIF/sticker library. ZIP files are imported locally once per browser.
+// Messages carry only stable pack and asset IDs, never GIF bytes.
+const GIF_DB_NAME='partychat-gif-library-v1';
+let gifDbPromise=null,gifLibraryMeta=null,gifIndexCache=[],gifPickerTab='gifs';
+const gifThumbUrls=new Map(),gifAssetUrls=new Map();
+function openGifDb(){
+  if(gifDbPromise)return gifDbPromise;
+  gifDbPromise=new Promise((resolve,reject)=>{
+    if(!window.indexedDB){reject(new Error('This browser does not provide IndexedDB storage.'));return}
+    const req=indexedDB.open(GIF_DB_NAME,1);
+    req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains('assets'))db.createObjectStore('assets',{keyPath:'id'});if(!db.objectStoreNames.contains('index'))db.createObjectStore('index',{keyPath:'id'});if(!db.objectStoreNames.contains('meta'))db.createObjectStore('meta',{keyPath:'key'})};
+    req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error||new Error('Could not open the GIF library database.'));
+  });
+  return gifDbPromise;
+}
+function gifDbGet(store,key){return openGifDb().then(db=>new Promise((resolve,reject)=>{const tx=db.transaction(store,'readonly'),req=tx.objectStore(store).get(key);req.onsuccess=()=>resolve(req.result||null);req.onerror=()=>reject(req.error)}))}
+function gifDbGetAll(store){return openGifDb().then(db=>new Promise((resolve,reject)=>{const tx=db.transaction(store,'readonly'),req=tx.objectStore(store).getAll();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error)}))}
+function gifDbPutAsset(asset,index){return openGifDb().then(db=>new Promise((resolve,reject)=>{const tx=db.transaction(['assets','index'],'readwrite');tx.objectStore('assets').put(asset);tx.objectStore('index').put(index);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error||new Error('Could not save a GIF to browser storage.'));tx.onabort=()=>reject(tx.error||new Error('GIF storage transaction was cancelled.'))}))}
+function gifDbPutMeta(meta){return openGifDb().then(db=>new Promise((resolve,reject)=>{const tx=db.transaction('meta','readwrite');tx.objectStore('meta').put(meta);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error||new Error('Could not save GIF library details.'));tx.onabort=()=>reject(tx.error||new Error('GIF library metadata transaction was cancelled.'))}))}
+function gifDbClear(){return openGifDb().then(db=>new Promise((resolve,reject)=>{const tx=db.transaction(['assets','index','meta'],'readwrite');tx.objectStore('assets').clear();tx.objectStore('index').clear();tx.objectStore('meta').clear();tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error||new Error('Could not clear the previous GIF library.'));tx.onabort=()=>reject(tx.error||new Error('GIF library reset was cancelled.'))}))}
+function gifHash(value){
+  const s=String(value);let a=0x811c9dc5,b=0x9e3779b9;
+  for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);a=Math.imul(a^c,0x01000193);b=Math.imul(b^(c+i),0x01000193)}
+  return (a>>>0).toString(16).padStart(8,'0')+(b>>>0).toString(16).padStart(8,'0');
+}
+function zipDirectory(buffer,count){
+  const dirView=new DataView(buffer),decoder=new TextDecoder();let p=0;const result=[];
+  for(let n=0;n<count;n++){
+    if(p+46>dirView.byteLength||dirView.getUint32(p,true)!==0x02014b50)throw new Error('The ZIP directory contains an invalid entry.');
+    const flags=dirView.getUint16(p+8,true),method=dirView.getUint16(p+10,true),crc=dirView.getUint32(p+16,true),compressedSize=dirView.getUint32(p+20,true),size=dirView.getUint32(p+24,true);
+    const nameLength=dirView.getUint16(p+28,true),extraLength=dirView.getUint16(p+30,true),commentLength=dirView.getUint16(p+32,true),localOffset=dirView.getUint32(p+42,true);
+    if(p+46+nameLength+extraLength+commentLength>dirView.byteLength)throw new Error('The ZIP directory entry is truncated.');
+    const name=decoder.decode(new Uint8Array(buffer,p+46,nameLength)).replace(/\\/g,'/');
+    const lower=name.toLowerCase(),isStickerPath=/(^|\/)stickers\//.test(lower),ext=lower.split('.').pop();
+    const supported=ext==='gif'||(isStickerPath&&(ext==='png'||ext==='webp'));
+    if(supported&&!name.endsWith('/'))result.push({path:name,flags,method,crc,compressedSize,size,localOffset,kind:isStickerPath?'sticker':'gif',ext});
+    p+=46+nameLength+extraLength+commentLength;
+  }
+  return result;
+}
+async function unpackZipEntry(file,entry){
+  if(entry.flags&1)throw new Error('Password-protected ZIP entries are not supported.');
+  if(entry.method!==0&&entry.method!==8)throw new Error('The ZIP uses an unsupported compression method for '+entry.path);
+  const headBuffer=await file.slice(entry.localOffset,entry.localOffset+30).arrayBuffer(),head=new DataView(headBuffer);
+  if(head.byteLength<30||head.getUint32(0,true)!==0x04034b50)throw new Error('The ZIP entry header is damaged: '+entry.path);
+  const nameLength=head.getUint16(26,true),extraLength=head.getUint16(28,true),dataStart=entry.localOffset+30+nameLength+extraLength;
+  if(dataStart+entry.compressedSize>file.size)throw new Error('The ZIP entry is outside the archive: '+entry.path);
+  const compressed=await file.slice(dataStart,dataStart+entry.compressedSize).arrayBuffer();
+  if(entry.method===0)return compressed;
+  if(typeof DecompressionStream!=='function')throw new Error('This browser cannot unpack ZIP files offline. Please update Chrome.');
+  try{return await new Response(new Blob([compressed]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer()}
+  catch(e){throw new Error('Could not decompress '+entry.path+': '+(e&&e.message||e))}
+}
+function gifFriendlyName(path){
+  let name=path.split('/').pop().replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').replace(/\b\d{8,}\b/g,'').replace(/\s+/g,' ').trim();
+  name=name.replace(/\s+GIF$/i,'').replace(/\s+Meme$/i,'').trim();
+  if(!name)name='Untitled GIF';
+  return name.replace(/\b([a-z])/g,(m,c)=>c.toUpperCase());
+}
+function gifValidAsset(bytes,ext){
+  if(ext==='gif')return bytes.length>=10&&bytes[0]===71&&bytes[1]===73&&bytes[2]===70&&bytes[3]===56&&(bytes[4]===55||bytes[4]===57)&&bytes[5]===97;
+  if(ext==='png')return bytes.length>=8&&bytes[0]===137&&bytes[1]===80&&bytes[2]===78&&bytes[3]===71;
+  if(ext==='webp')return bytes.length>=12&&bytes[0]===82&&bytes[1]===73&&bytes[2]===70&&bytes[3]===70&&bytes[8]===87&&bytes[9]===69&&bytes[10]===66&&bytes[11]===80;
+  return false;
+}
+async function makeGifThumbnail(blob){
+  const url=URL.createObjectURL(blob),img=new Image();
+  try{
+    img.src=url;
+    await Promise.race([img.decode(),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Thumbnail decode timed out')),10000))]);
+    const w=img.naturalWidth||img.width,h=img.naturalHeight||img.height;if(!w||!h)return null;
+    const scale=Math.min(1,220/w,150/h),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(w*scale));canvas.height=Math.max(1,Math.round(h*scale));
+    const ctx=canvas.getContext('2d');if(!ctx)return null;ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    return await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',.76));
+  }catch(_){return null}
+  finally{img.removeAttribute('src');URL.revokeObjectURL(url)}
+}
+function gifPickerStatus(text,progress){const status=$('gifImportStatus');status.hidden=!text;if(text)status.textContent=text+(progress?' · '+progress:'')}
+function revokeGifThumbUrls(){for(const url of gifThumbUrls.values())URL.revokeObjectURL(url);gifThumbUrls.clear()}
+function closeGifPicker(){const p=$('gifPicker');p.classList.remove('open');p.setAttribute('aria-hidden','true');$('gifBtn').setAttribute('aria-expanded','false')}
+async function refreshGifLibrary(){
+  gifLibraryMeta=await gifDbGet('meta','library');gifIndexCache=gifLibraryMeta?await gifDbGetAll('index'):[];
+  gifIndexCache.sort((a,b)=>a.name.localeCompare(b.name));
+  $('gifPackStatus').textContent=gifLibraryMeta?(gifLibraryMeta.count+' items installed · '+formatGifBytes(gifLibraryMeta.bytes)+' offline'):'No offline library installed yet.';
+  $('gifCount').textContent=gifIndexCache.filter(x=>x.kind==='gif').length;$('stickerCount').textContent=gifIndexCache.filter(x=>x.kind==='sticker').length;
+  return gifIndexCache;
+}
+function formatGifBytes(n){if(n>=1073741824)return(n/1073741824).toFixed(1)+' GB';if(n>=1048576)return(n/1048576).toFixed(1)+' MB';return Math.round(n/1024)+' KB'}
+function gifThumbUrl(item){if(!item.thumb)return'';if(!gifThumbUrls.has(item.id))gifThumbUrls.set(item.id,URL.createObjectURL(item.thumb));return gifThumbUrls.get(item.id)}
+function renderGifPicker(){
+  const grid=$('gifGrid');grid.replaceChildren();const isSticker=gifPickerTab==='stickers';
+  $('gifTabGifs').classList.toggle('active',!isSticker);$('gifTabGifs').setAttribute('aria-pressed',String(!isSticker));
+  $('gifTabStickers').classList.toggle('active',isSticker);$('gifTabStickers').setAttribute('aria-pressed',String(isSticker));
+  const q=$('gifSearch').value.trim().toLowerCase(),items=gifIndexCache.filter(x=>(isSticker?x.kind==='sticker':x.kind!=='sticker')&&(!q||(x.name+' '+x.path+' '+x.category).toLowerCase().includes(q)));
+  if(!gifLibraryMeta){
+    const empty=document.createElement('div');empty.className='gif-empty';const strong=document.createElement('strong');strong.textContent='Import your GIF pack';
+    const msg=document.createElement('span');msg.textContent='Choose PartyChatGifs.zip once. The library will then work offline in this browser.';
+    const btn=document.createElement('button');btn.type='button';btn.textContent='Choose ZIP file';btn.onclick=()=>$('gifPackInput').click();empty.append(strong,msg,btn);grid.appendChild(empty);return;
+  }
+  if(!items.length){
+    const empty=document.createElement('div');empty.className='gif-empty';const strong=document.createElement('strong');strong.textContent=isSticker?'No stickers in this pack yet.':'No GIFs match your search.';
+    const msg=document.createElement('span');msg.textContent=isSticker?'Your uploaded ZIP contains animated GIFs, but no files in a stickers folder. You can add stickers to a future pack.':'Try a different search, or import another pack.';
+    empty.append(strong,msg);grid.appendChild(empty);return;
+  }
+  items.forEach(item=>{
+    const card=document.createElement('button');card.type='button';card.className='gif-card';card.title='Send '+item.name;
+    if(item.thumb){const img=document.createElement('img');img.alt=item.name;img.loading='lazy';img.src=gifThumbUrl(item);card.appendChild(img)}
+    else{const thumb=document.createElement('span');thumb.className='gif-thumb-empty';thumb.textContent=item.kind==='sticker'?'✦':'GIF';card.appendChild(thumb)}
+    const label=document.createElement('span');label.className='gif-card-name';label.textContent=item.name;
+    const category=document.createElement('span');category.className='gif-card-category';category.textContent=item.category||item.kind;
+    card.append(label,category);card.onclick=()=>sendGifAsset(item);grid.appendChild(card);
+  });
+}
+function openGifPicker(){
+  const p=$('gifPicker');if(p.classList.contains('open')){closeGifPicker();return}
+  closePanels();$('toolsPanel').classList.remove('open');p.classList.add('open');p.setAttribute('aria-hidden','false');$('gifBtn').setAttribute('aria-expanded','true');
+  refreshGifLibrary().then(renderGifPicker).catch(err=>{gifPickerStatus('GIF storage is unavailable: '+(err&&err.message||err));renderGifPicker()});
+  setTimeout(()=>$('gifSearch').focus(),30);
+}
+async function hydrateGifFrame(holder,descriptor){
+  holder.replaceChildren();holder.className='gif-message-loading';
+  const library=gifLibraryMeta||await gifDbGet('meta','library').catch(()=>null);
+  if(!library||library.packId!==descriptor.packId){
+    holder.className='gif-message-missing';const msg=document.createElement('span');msg.textContent='This GIF needs the matching Party Chat GIF pack.';
+    const btn=document.createElement('button');btn.type='button';btn.textContent='Open GIF library';btn.onclick=()=>openGifPicker();holder.append(msg,btn);return;
+  }
+  const record=await gifDbGet('assets',descriptor.id).catch(()=>null);
+  if(!record||record.packId!==descriptor.packId||!record.blob){holder.className='gif-message-missing';holder.textContent='This GIF is missing from the installed pack.';return}
+  let url=gifAssetUrls.get(descriptor.id);if(!url){url=URL.createObjectURL(record.blob);gifAssetUrls.set(descriptor.id,url)}
+  const img=document.createElement('img');img.className='message-gif';img.alt=descriptor.name||'Animated GIF';img.loading='lazy';img.decoding='async';img.src=url;img.addEventListener('click',()=>openImageViewer(url));
+  holder.className='gif-message-content';holder.appendChild(img);
+  const caption=holder.dataset.caption||'';if(caption){const cap=document.createElement('div');cap.className='gif-caption';cap.textContent=caption;holder.appendChild(cap)}
+}
+function renderGifInBubble(message,bubble){
+  const g=message.gif||{};
+  if(typeof g.id!=='string'||!/^pcgif_[a-f0-9]{16}$/.test(g.id)||typeof g.packId!=='string'||!/^pcpack_[a-f0-9]{16}$/.test(g.packId)){
+    const fail=document.createElement('div');fail.className='image-error';fail.textContent='This GIF message has an invalid asset reference.';bubble.appendChild(fail);return false;
+  }
+  const holder=document.createElement('div');holder.className='gif-message-loading';holder.dataset.gifId=g.id;holder.dataset.gifPack=g.packId;
+  holder.dataset.gifName=(g.name||'Animated GIF').slice(0,120);const fallback='GIF: '+holder.dataset.gifName;
+  holder.dataset.caption=message.text&&message.text!==fallback?String(message.text).slice(0,500):'';bubble.appendChild(holder);
+  hydrateGifFrame(holder,{id:g.id,packId:g.packId,name:holder.dataset.gifName}).catch(err=>{holder.className='gif-message-missing';holder.textContent='Could not load this GIF: '+(err&&err.message||err)});
+  return true;
+}
+function refreshMissingGifMessages(){
+  document.querySelectorAll('.gif-message-missing[data-gif-id]').forEach(holder=>{hydrateGifFrame(holder,{id:holder.dataset.gifId,packId:holder.dataset.gifPack,name:holder.dataset.gifName}).catch(()=>{})});
+}
+function sendGifAsset(asset){
+  if(!asset||!gifLibraryMeta||asset.packId!==gifLibraryMeta.packId){system('That GIF is not part of the currently installed library.');return}
+  if(!ws||ws.readyState!==WebSocket.OPEN){system('Not connected. Your GIF library is ready; try sending again when connected.');return}
+  const caption=$('text').value.trim(),label=asset.name||'Animated GIF';
+  const d={type:'msg',id:crypto.randomUUID(),name:name||'Anonymous',avatar,text:caption||'GIF: '+label,time:Date.now(),clientId,gif:{id:asset.id,packId:asset.packId,name:label,kind:asset.kind||'gif'}};
+  diag.sentAt.set(d.id,Date.now());diag.deliveryTotal++;
+  if(!send(d)){system('The GIF could not be sent because the connection is unavailable.');return}
+  add(d,true);$('text').value='';replyTo=null;$('replyPreview').classList.remove('visible');$('text').focus();closeGifPicker();
+  debugLog('GIF','GIF/sticker ID sent through the existing WebSocket',{messageId:d.id,assetId:asset.id,packId:asset.packId});
+}
+async function importGifPack(file){
+  if(!file)return;
+  if(file.size>300*1024*1024){gifPickerStatus('This ZIP is larger than the 300 MB import limit.');return}
+  gifPickerStatus('Reading ZIP directory…');
+  try{
+    const tailStart=Math.max(0,file.size-65557),tail=await file.slice(tailStart).arrayBuffer(),tailView=new DataView(tail);let end=-1;
+    for(let i=tailView.byteLength-22;i>=Math.max(0,tailView.byteLength-65557);i--){if(tailView.getUint32(i,true)===0x06054b50){end=i;break}}
+    if(end<0)throw new Error('The ZIP archive is missing its directory record.');
+    const cdOffset=tailView.getUint32(end+16,true),cdSize=tailView.getUint32(end+12,true),entryCount=tailView.getUint16(end+10,true);
+    if(cdOffset===0xffffffff||cdSize===0xffffffff||entryCount===0xffff)throw new Error('ZIP64 archives are not supported.');
+    if(cdOffset+cdSize>file.size||entryCount>5000)throw new Error('The ZIP directory is invalid or unusually large.');
+    const cdBuffer=await file.slice(cdOffset,cdOffset+cdSize).arrayBuffer(),entries=zipDirectory(cdBuffer,entryCount);
+    if(!entries.length)throw new Error('No supported GIFs or sticker images were found. GIFs are supported anywhere; PNG/WebP stickers must be inside a stickers folder.');
+    const totalBytes=entries.reduce((sum,e)=>sum+e.size,0);if(totalBytes>300*1024*1024)throw new Error('The extracted library is larger than the 300 MB import limit.');
+    const uniqueEntries=[],seenPaths=new Set();entries.forEach(e=>{if(!seenPaths.has(e.path)){seenPaths.add(e.path);uniqueEntries.push(e)}});
+    const packSignature=uniqueEntries.slice().sort((a,b)=>a.path.localeCompare(b.path)).map(e=>e.path+'|'+e.crc+'|'+e.size+'|'+e.method).join('\n'),packId='pcpack_'+gifHash(packSignature);
+    gifPickerStatus('Preparing '+uniqueEntries.length+' animated assets…');
+    if(navigator.storage&&navigator.storage.estimate){const estimate=await navigator.storage.estimate().catch(()=>null);if(estimate&&estimate.quota&&estimate.usage!=null&&estimate.quota-estimate.usage<totalBytes+10*1024*1024)throw new Error('There may not be enough browser storage for this pack ('+formatGifBytes(totalBytes)+' required). Free some space or use a browser with more storage available.')}
+    revokeGifThumbUrls();for(const url of gifAssetUrls.values())URL.revokeObjectURL(url);gifAssetUrls.clear();await gifDbClear();
+    let completed=0;
+    for(const entry of uniqueEntries){
+      const raw=await unpackZipEntry(file,entry),bytes=new Uint8Array(raw);
+      if(bytes.length!==entry.size||!gifValidAsset(bytes,entry.ext))throw new Error('The file failed its size or image-format check: '+entry.path);
+      const mime=entry.ext==='gif'?'image/gif':entry.ext==='png'?'image/png':'image/webp',blob=new Blob([bytes],{type:mime});
+      const id='pcgif_'+gifHash(entry.path+'|'+entry.crc+'|'+entry.size),name=gifFriendlyName(entry.path),kind=entry.kind;
+      const category=entry.path.toLowerCase().includes('/memes/')?'memes':entry.path.toLowerCase().includes('/gifs/')?'gifs':kind==='sticker'?'stickers':'library';
+      const thumb=await makeGifThumbnail(blob);
+      await gifDbPutAsset({id,packId,blob},{id,packId,name,path:entry.path,size:entry.size,kind,category,thumb});
+      completed++;gifPickerStatus('Importing '+name+'…',completed+' / '+uniqueEntries.length);
+    }
+    await gifDbPutMeta({key:'library',packId,count:uniqueEntries.length,bytes:totalBytes,archiveName:file.name,installedAt:new Date().toISOString()});
+    await refreshGifLibrary();renderGifPicker();refreshMissingGifMessages();
+    gifPickerStatus('Library installed successfully.',completed+' assets · '+formatGifBytes(totalBytes)+' stored offline');
+    debugLog('GIF','Offline GIF library imported',{packId,count:completed,bytes:totalBytes,archive:file.name});
+  }catch(err){
+    try{await gifDbClear()}catch(_){}
+    gifLibraryMeta=null;gifIndexCache=[];renderGifPicker();gifPickerStatus('Import failed: '+(err&&err.message||err)+' Choose the ZIP again to retry.');
+    debugLog('ERROR','Offline GIF library import failed',{error:String(err),file:file.name});
+  }
+}
+
 function add(d,mine=false,save=true){
   const sender=d.name||'Anonymous', messages=$('messages'); let group=messages.lastElementChild;
   const same=group&&group.classList.contains('message-group')&&group.dataset.name===sender&&!group.classList.contains('system')&&!d.poll&&!d.countdown&&!d.temporary;
@@ -623,7 +859,7 @@ function add(d,mine=false,save=true){
   if(d.poll){renderPoll(d,group);if(save)saveHistory(d);messages.scrollTop=messages.scrollHeight;return}
   if(d.countdown){renderCountdown(d,group);if(save)saveHistory(d);messages.scrollTop=messages.scrollHeight;return}
   const line=document.createElement('div');line.className='message-line';
-  const b=document.createElement('div');b.className='bubble single'+(d.image?' image-bubble':'');b.dataset.messageId=d.id||crypto.randomUUID();b.dataset.rawText=d.text||'';b.dataset.senderId=d.clientId||'';b.dataset.time=d.time||Date.now();const imageAccepted=d.image?renderImageInBubble(d,b):true;if(!d.image)b.textContent=d.text||'';
+  const b=document.createElement('div');b.className='bubble single'+((d.image||d.gif)?' image-bubble':'');b.dataset.messageId=d.id||crypto.randomUUID();b.dataset.rawText=d.text||'';b.dataset.senderId=d.clientId||'';b.dataset.time=d.time||Date.now();const imageAccepted=d.image?renderImageInBubble(d,b):(d.gif?renderGifInBubble(d,b):true);if(!d.image&&!d.gif)b.textContent=d.text||'';
   if(d.replyText){const q=document.createElement('div');q.style.cssText='font-size:11px;opacity:.7;border-left:3px solid currentColor;padding-left:6px;margin-bottom:5px';q.textContent='↳ '+d.replyName+': '+d.replyText;b.prepend(q)}
   if(d.expiresAt){const ex=document.createElement('span');ex.style.cssText='display:block;font-size:9px;opacity:.65;margin-top:4px';ex.textContent='⏳ temporary';b.appendChild(ex);scheduleExpiry(d)}
   group.querySelectorAll('.bubble').forEach(x=>x.classList.remove('last','single'));const bs=group.querySelectorAll('.bubble');if(bs.length)b.classList.add('last');if(bs.length===1)b.classList.add('first');
@@ -741,6 +977,15 @@ async function sendSelectedImage(){
   finally{imageSendBusy=false;$('imageCancelBtn').disabled=false;$('imageBtn').disabled=false;if(pendingImageFile)$('imageSendBtn').disabled=false}
 }
 $('imageBtn').onclick=()=>$('imageFileInput').click();$('imageFileInput').onchange=e=>{const f=e.target.files&&e.target.files[0];if(f)setImagePreview(f)};$('imageCancelBtn').onclick=clearPendingImage;$('imageSendBtn').onclick=sendSelectedImage;
+$('gifBtn').onclick=openGifPicker;$('gifClose').onclick=closeGifPicker;
+$('gifTabGifs').onclick=()=>{gifPickerTab='gifs';renderGifPicker()};
+$('gifTabStickers').onclick=()=>{gifPickerTab='stickers';renderGifPicker()};
+$('gifSearch').oninput=renderGifPicker;
+$('gifImportBtn').onclick=()=>$('gifPackInput').click();
+$('gifPackInput').onchange=e=>{const f=e.target.files&&e.target.files[0];e.target.value='';if(f)importGifPack(f)};
+document.addEventListener('click',e=>{if(!$('gifPicker').contains(e.target)&&e.target!==$('gifBtn')&&!$('gifBtn').contains(e.target))closeGifPicker()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('gifPicker').classList.contains('open'))closeGifPicker()});
+
 
 // Camera capture uses the browser's live camera preview. The captured photo is
 // converted to a File and then follows the exact same quality/size/WebSocket path.
@@ -832,7 +1077,7 @@ $('diagDisconnect').onclick=()=>{if(ws){debugLog('INFO','Manual disconnect simul
 function diagnosticReport(){return {generated:new Date().toISOString(),clientId,name,channel:CHANNEL,router:ROUTER,connection:ws?['CONNECTING','OPEN','CLOSING','CLOSED'][ws.readyState]:'NONE',uptimeMs:Date.now()-network.started,reconnects:network.reconnects,messages:network.msgs,events:network.events,sentBytes:network.sentBytes||0,receivedBytes:network.receivedBytes||0,avgRtt:network.rtt.length?Math.round(network.rtt.reduce((a,b)=>a+b,0)/network.rtt.length):null,members:[...members.values()],delivery:{confirmed:diag.delivered,total:diag.deliveryTotal},seen:diag.seen,packetTests:diag.packetTests,stressEvents:diag.stress,eventCounts:diag.eventCounts,population:diag.population,acknowledgements:[...diag.messageAcks.values()],fps:diag.fps,domNodes:document.querySelectorAll('*').length,timeline:diag.timeline.slice(-100),debug:debugState.events.slice(-100)}}
 $('diagExport').onclick=()=>{const blob=new Blob([JSON.stringify(diagnosticReport(),null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='party-room-diagnostics.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);debugLog('DOM','Diagnostics exported')};$('diagIncident').onclick=()=>{const r=diagnosticReport();r.incident=true;r.incidentWindow=diag.timeline.slice(-60);const blob=new Blob([JSON.stringify(r,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='party-room-incident.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);$('diagResult').textContent='Incident report saved with the most recent diagnostic activity.';debugLog('DOM','Incident report saved')};
 setInterval(()=>{recordPopulation();updateDiagVisuals();updateStatusPanel()},500);
-try{const h=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');h.slice(-50).forEach(d=>add(d,d.clientId===clientId,false))}catch{}
+try{const h=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');h.slice(-50).forEach(d=>add(d,d.clientId===clientId,false))}catch{};refreshGifLibrary().then(refreshMissingGifMessages).catch(err=>debugLog('WARN','Offline GIF library unavailable',{error:String(err)}));
 connect();
 setInterval(()=>{if($('peoplePanel').classList.contains('open')){renderPeoplePanel();updateActivityPanel()}},1000);
 }
@@ -843,7 +1088,7 @@ setInterval(()=>{if($('peoplePanel').classList.contains('open')){renderPeoplePan
   'use strict';
   if (window.__PARTYCHAT_BOOTSTRAP_ONLY__) return;
 
-  var APP_VERSION = '1.0.4';
+  var APP_VERSION = '1.0.5';
   var MANIFEST_URL = 'https://raw.githubusercontent.com/ekemp20-del/party-chat-updates/main/manifest.json';
   var BASE_URL = 'https://raw.githubusercontent.com/ekemp20-del/party-chat-updates/main/';
   var ACTIVE_KEY = 'partychat.runtime.active.v1';
