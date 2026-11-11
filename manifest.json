@@ -1,8 +1,8 @@
 {
   "app": "Party Chat",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "releasedAt": "2026-11-11",
   "file": "PartyChat.html",
-  "sha256": "392ec02d2a4b91db629dd85b9d66eaba6a7d1afaed144b1a3ee0e9892a7738f3",
-  "notes": "Replaces manual ZIP selection with one-click GitHub-hosted GIF library download, verified chunk-by-chunk and stored for offline use. Unifies GIF, photo, camera and plus controls with the message field's height, background, border and capsule radius."
+  "sha256": "c11238157f45bef5ddaf99e4d88de25548ac2eaa99df83ca7ba94994ba578308",
+  "notes": "Fixes GIF library downloads in normal Chrome profiles by bypassing cached responses, adding unique cache-busting URLs, and retrying failed chunk requests. Every chunk is still checked against its expected size and SHA-256 before import."
 }
