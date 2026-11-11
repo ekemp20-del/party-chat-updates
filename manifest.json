@@ -3,6 +3,6 @@
   "version": "1.0.3",
   "releasedAt": "2026-11-11",
   "file": "PartyChat.html",
-  "sha256": "46a197ffb4ffb99ae2020a92dfe5396d600bccf969adfc3a5527b840621b8f13",
+  "sha256": "0863b7ca66b9d2db0adf3ccd54fe84fdc6ea621d5fdea1ce77e949d8ad4674ed",
   "notes": "Fixes duplicate app rendering during staged updates; restores the original P logo; makes the U+2699 Settings gear a full-height header control with a small caption; increases spacing before the display-name field; clears stale staged updates and reports when up to date."
 }
