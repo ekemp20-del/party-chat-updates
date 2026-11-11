@@ -1,6 +1,10 @@
-Party Chat 1.0.1 — 11 November 2026
+Party Chat 1.0.2 — 11 November 2026
 
-- Adds automatic update checks against the Party Chat GitHub release manifest.
-- Verifies downloaded releases using SHA-256 before staging them.
-- Applies updates after restart instead of interrupting an active conversation.
-- Keeps the existing WebSocket messaging, image transfer and in-chat camera implementation.
+- Removed the duplicated Party Chat branding from the top centre of the header.
+- Replaced the plain P badge with a custom speech-bubble and sparkle mark at the top left.
+- Enlarged and clearly labelled the display-name field.
+- Moved People & Activity, Status, Diagnostics and About into the Settings menu.
+- Added a settings gear icon and improved the menu layout.
+- Added a direct link to the public GitHub repository in Settings.
+- Added a subtle chat background gradient that follows the selected accent colour and adapts to light or dark appearance.
+- Preserved the existing WebSocket transport, high-quality image messaging, in-chat camera and automatic update mechanism.
