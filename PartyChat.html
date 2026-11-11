@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en" data-partychat-version="1.0.1"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script>
+/* Party Chat update bootstrap. Keep this in every published build. */
+(function () {
+  'use strict';
+  var CURRENT_VERSION = '1.0.1';
+  var CACHE_KEY = 'partychat.update.staged.v1';
+  function compareVersions(a, b) {
+    var aa = String(a).split('.').map(function (x) { return parseInt(x, 10) || 0; });
+    var bb = String(b).split('.').map(function (x) { return parseInt(x, 10) || 0; });
+    for (var i = 0; i < Math.max(aa.length, bb.length); i++) {
+      var av = aa[i] || 0, bv = bb[i] || 0;
+      if (av !== bv) return av > bv ? 1 : -1;
+    }
+    return 0;
+  }
+  try {
+    var raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return;
+    var staged = JSON.parse(raw);
+    if (!staged || !staged.version || typeof staged.html !== 'string') {
+      localStorage.removeItem(CACHE_KEY); return;
+    }
+    if (compareVersions(staged.version, CURRENT_VERSION) <= 0) {
+      localStorage.removeItem(CACHE_KEY); return;
+    }
+    var marker = 'data-partychat-version="' + staged.version + '"';
+    if (staged.html.indexOf(marker) === -1 || staged.html.indexOf('<title>Party Chat</title>') === -1) {
+      localStorage.removeItem(CACHE_KEY); return;
+    }
+    document.open();
+    document.write(staged.html);
+    document.close();
+  } catch (e) {
+    /* Storage can be disabled for some file:// configurations; keep the local build running. */
+  }
+})();
+</script>
+<title>Party Chat</title><style>
+:root{
+ --bg:#f2f2f7;--surface:#fff;--surface-2:#f8f8fa;--surface-3:#ececf1;--text:#17171a;--muted:#72727c;--border:#d7d7dc;
+ --accent:#0a84ff;--accent-soft:#e8f3ff;--mine-bubble:#0a84ff;--mine-text:#fff;--bubble:#e9e9ee;--bubble-text:#17171a;
+ --success:#34c759;--danger:#ff3b30;--shadow:0 20px 60px rgba(0,0,0,.13)
+}
+body.dark{--bg:#000;--surface:#1c1c1e;--surface-2:#2c2c2e;--surface-3:#3a3a3c;--text:#f2f2f7;--muted:#98989f;--border:#3a3a3c;--accent:#0a84ff;--accent-soft:#18314a;--mine-bubble:#0a84ff;--mine-text:#fff;--bubble:#2c2c2e;--bubble-text:#f2f2f7;--shadow:0 20px 60px rgba(0,0,0,.45)}
+body.theme-blue{--accent:#1769aa;--accent-soft:#e7f2f9;--mine-bubble:#1769aa}body.theme-green{--accent:#248a3d;--accent-soft:#e7f5eb;--mine-bubble:#248a3d}body.theme-purple{--accent:#7b3fc6;--accent-soft:#f0e8f8;--mine-bubble:#7b3fc6}body.theme-red{--accent:#e53935;--accent-soft:#fde9e8;--mine-bubble:#e53935}body.theme-orange{--accent:#e87500;--accent-soft:#fff0df;--mine-bubble:#e87500}body.theme-pink{--accent:#d63384;--accent-soft:#fbe7f0;--mine-bubble:#d63384}body.theme-cyan{--accent:#008c9e;--accent-soft:#e5f5f7;--mine-bubble:#008c9e}body.theme-yellow{--accent:#a07800;--accent-soft:#fff5cf;--mine-bubble:#a07800}
+body.dark.theme-blue{--accent:#4ba7e8;--accent-soft:#173449;--mine-bubble:#2387c7}body.dark.theme-green{--accent:#5bc978;--accent-soft:#163322;--mine-bubble:#2d9b4b}body.dark.theme-purple{--accent:#b47be8;--accent-soft:#2a1f35;--mine-bubble:#9257d1}body.dark.theme-red{--accent:#ff7773;--accent-soft:#382022;--mine-bubble:#ef5b57}body.dark.theme-orange{--accent:#ffad5c;--accent-soft:#382b1d;--mine-bubble:#ed8b2d}body.dark.theme-pink{--accent:#f07ab0;--accent-soft:#38232e;--mine-bubble:#e45b9a}body.dark.theme-cyan{--accent:#4bd0dd;--accent-soft:#1b3134;--mine-bubble:#27b5c5}body.dark.theme-yellow{--accent:#e0c64a;--accent-soft:#36321e;--mine-bubble:#c5a52b}
+*{box-sizing:border-box}html,body{height:100%;width:100%;margin:0}body{display:flex;flex-direction:column;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;overflow:hidden;transition:background .2s,color .2s}button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+header{height:64px;flex:0 0 64px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.92);backdrop-filter:saturate(180%) blur(20px);z-index:20}body.dark header{background:rgba(28,28,30,.94)}
+.brand{display:flex;align-items:center;gap:10px;min-width:240px}.brand-mark{width:36px;height:36px;border-radius:11px;background:var(--accent);display:grid;place-items:center;color:#fff;font-weight:800;font-size:18px;box-shadow:0 4px 14px rgba(10,132,255,.22)}#title{font-size:16px;font-weight:760;letter-spacing:-.015em}.subtitle{font-size:10px;color:var(--muted);margin-top:2px}#status{font-size:10px;color:var(--muted);margin-top:2px}#status:before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-right:5px;vertical-align:1px}
+.header-room{position:absolute;left:50%;transform:translateX(-50%);text-align:center}.header-room strong{display:block;font-size:13px;font-weight:700}.header-room span{display:block;margin-top:2px;font-size:9px;color:var(--muted)}
+.utility{display:flex;align-items:center;gap:4px}.nav-btn,.utility #aboutBtn,.utility #settingsBtn{height:36px;border:0;background:transparent;color:var(--muted);border-radius:10px;padding:0 10px;font-size:11px;font-weight:650}.nav-btn:hover,.utility #aboutBtn:hover,.utility #settingsBtn:hover,.nav-btn.active{background:var(--surface-3);color:var(--text)}.nav-btn.active{box-shadow:inset 0 0 0 1px var(--border)}#namebar{display:flex;align-items:center;gap:7px;margin-left:7px;padding-left:10px;border-left:1px solid var(--border)}#name{width:118px;height:34px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);border-radius:17px;padding:0 12px;font-size:11px}#people{font-size:10px;color:var(--muted);white-space:nowrap}
+#theme{min-width:108px;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 8px;font-size:11px}#mode{background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:11px}.settings-popover{display:none;position:fixed;top:58px;right:16px;width:250px;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:14px;z-index:95}.settings-popover.open{display:block}.settings-title{font-weight:750;font-size:13px;margin-bottom:10px}.settings-row{display:flex;align-items:center;justify-content:space-between;gap:9px;border-top:1px solid var(--border);padding:9px 0}.settings-row:first-of-type{border-top:0}.settings-row>span{font-size:11px}
+#messages{position:relative;flex:1;overflow:auto;padding:20px max(18px,calc((100vw - 920px)/2));display:flex;flex-direction:column;gap:5px;scroll-behavior:smooth}.message-group{max-width:min(620px,78%);align-self:flex-start}.message-group.mine{align-self:flex-end;text-align:right}.message-group .name{font-size:10px;font-weight:650;color:var(--muted);margin:4px 10px 3px}.message-line{display:flex;align-items:center;gap:5px;width:fit-content;max-width:100%}.message-group.mine .message-line{margin-left:auto;flex-direction:row-reverse}.message-group .bubble{display:block;width:fit-content;max-width:100%;padding:9px 13px;background:var(--bubble);color:var(--bubble-text);border:0;border-radius:19px;box-shadow:0 1px 2px rgba(0,0,0,.07);white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.38;font-size:14px}.message-group.mine .bubble{background:var(--mine-bubble);color:var(--mine-text)}.message-group:not(.mine) .bubble.last{border-bottom-left-radius:6px}.message-group.mine .bubble.last{border-bottom-right-radius:6px}.message-group .bubble.first{border-top-left-radius:19px}.message-actions{display:flex;gap:3px;opacity:0;pointer-events:none;transition:opacity .15s}.message-line:hover .message-actions{opacity:1;pointer-events:auto}.message-actions button{width:26px;height:26px;padding:0;border-radius:50%;border:1px solid var(--border);background:var(--surface-2);color:var(--muted);font-size:12px}.message-actions button:hover{background:var(--surface-3);color:var(--text)}.message-actions .more-menu{position:absolute;right:0;bottom:30px;display:none;min-width:145px;padding:5px;background:var(--surface);border:1px solid var(--border);border-radius:11px;box-shadow:var(--shadow);z-index:60}.more-menu.open{display:block}.more-menu button{width:100%;height:auto;border:0;border-radius:7px;background:transparent;color:var(--text);text-align:left;padding:8px 9px;font-size:11px}.more-menu button:hover{background:var(--surface-2)}.delivery{font-size:9px;color:var(--muted);margin:3px 8px}.delivery.pending{opacity:.65}.reaction-picker{position:fixed;display:none;align-items:center;gap:2px;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:4px;box-shadow:var(--shadow);z-index:100}.reaction-picker.open{display:flex}.reaction-picker button{width:31px!important;height:31px!important;border:0!important;border-radius:50%!important;background:transparent!important;color:var(--text)!important;padding:0!important;font-size:18px!important}.reaction-picker button:hover{background:var(--surface-2)!important}.reaction-row{display:flex;gap:3px;margin-top:3px}.reaction{font-size:11px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:2px 6px;cursor:pointer}.system{text-align:center;color:var(--muted);font-size:10px;margin:8px 0}
+.typing-wrap{min-height:0;padding:0 max(18px,calc((100vw - 920px)/2)) 7px}.typing-bubble{display:none;width:fit-content;padding:6px 9px;border:1px solid var(--border);background:var(--surface-2);border-radius:14px;color:var(--muted);font-size:10px}.typing-bubble.visible{display:block}
+.members-bar{display:flex;align-items:center;gap:8px;min-height:42px;flex:0 0 42px;padding:5px max(18px,calc((100vw - 920px)/2));border-top:1px solid var(--border);background:var(--surface)}.members-label{font-size:9px;letter-spacing:.08em;font-weight:750;color:var(--muted)}.member-list{display:flex;align-items:center;gap:5px;overflow-x:auto;min-width:0}.member-chip{display:flex;align-items:center;gap:5px;padding:4px 8px;background:var(--surface-2);border:1px solid var(--border);border-radius:14px;white-space:nowrap;font-size:10px;cursor:pointer}.member-chip:hover{background:var(--surface-3)}.member-dot{width:7px;height:7px;border-radius:50%}
+.reply-preview{display:none;align-items:center;justify-content:space-between;gap:10px;padding:7px max(18px,calc((100vw - 920px)/2));border-top:1px solid var(--border);background:var(--accent-soft);color:var(--muted);font-size:10px}.reply-preview.visible{display:flex}.reply-preview button{background:transparent;border:0;color:var(--accent);font-size:10px;font-weight:650;padding:3px 5px}
+form{display:flex;align-items:flex-end;gap:7px;padding:8px max(18px,calc((100vw - 920px)/2)) 11px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0}.compose-shell{display:flex;align-items:center;flex:1;min-height:42px;background:var(--surface-2);border:1px solid var(--border);border-radius:22px;padding:0 6px 0 13px}.compose-shell:focus-within{border-color:var(--accent)}#text{flex:1;min-width:0;height:40px;border:0;outline:0;background:transparent;color:var(--text);padding:0;font-size:14px}#toolsBtn{width:34px;height:34px;border:0;border-radius:50%;background:transparent;color:var(--muted);font-size:21px;padding:0;line-height:1}#toolsBtn:hover{background:var(--surface-3);color:var(--text)}form>button[type=submit]{height:40px;min-width:62px;border:0;border-radius:20px;padding:0 16px;background:var(--mine-bubble);color:#fff;font-size:12px;font-weight:700}form>button[type=submit]:hover{filter:brightness(1.05)}
+.tools-wrap{position:relative}.tools-panel{display:none;position:absolute;right:0;bottom:45px;width:270px;padding:11px;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);z-index:70}.tools-panel.open{display:block}.tools-panel h3{margin:0 0 8px;font-size:12px}.tools-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.tools-grid button{background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:8px 7px;font-size:10px}.tools-grid button:hover{background:var(--surface-3)}.tool-section{border-top:1px solid var(--border);margin-top:9px;padding-top:9px}.tool-section label{display:block;margin-bottom:5px;color:var(--muted);font-size:10px}.tool-section select{width:100%;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:7px;font-size:10px}
+.profile-pop{display:none;position:fixed;width:220px;padding:12px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:13px;box-shadow:var(--shadow);z-index:90}.profile-pop.open{display:block}.profile-name{font-size:14px;font-weight:750}.profile-state{display:flex;align-items:center;gap:6px;margin-top:5px;font-size:10px;color:var(--muted)}.state-dot{width:7px;height:7px;border-radius:50%;background:var(--success)}.state-dot.idle{background:#ff9f0a}.profile-meta{margin-top:9px;color:var(--muted);font-size:10px;line-height:1.55}
+#peoplePanel,#statusPanel{display:none;position:fixed;inset:64px 0 0;background:rgba(0,0,0,.25);z-index:80}#peoplePanel.open,#statusPanel.open{display:block}.friendly-box{position:absolute;top:12px;right:12px;bottom:12px;width:min(390px,calc(100% - 24px));overflow:auto;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}.friendly-head,.status-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--border)}.friendly-head strong,.status-head strong{font-size:17px}.status-sub{margin-top:3px;font-size:10px;color:var(--muted)}.panel-close{padding:7px 10px!important;border-radius:9px!important;background:var(--surface-2)!important;color:var(--text)!important;border:1px solid var(--border)!important;font-size:10px!important}.people-cards{display:flex;flex-direction:column;gap:7px}.people-card{padding:10px;border-radius:11px;border:1px solid var(--border);background:var(--surface-2);cursor:pointer}.people-card:hover{background:var(--surface-3)}.people-card-top{display:flex;align-items:center;gap:8px}.people-card-name{font-size:12px;font-weight:700}.people-card-dot{width:8px;height:8px;border-radius:50%}.people-card-state,.people-card-stats{margin-top:4px;color:var(--muted);font-size:10px}.people-card-stats{display:flex;gap:12px;margin-top:8px}.activity-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px}.activity-card{min-height:65px;padding:10px;background:var(--surface-2);border:1px solid var(--border);border-radius:11px}.activity-card.wide{grid-column:1/-1}.activity-list{margin-top:7px}.activity-row{display:grid;grid-template-columns:80px 1fr 22px;gap:6px;align-items:center;font-size:10px;margin:4px 0}.activity-bar{height:6px;border-radius:4px;background:var(--accent);opacity:.65}.activity-bars{height:60px;display:flex;align-items:flex-end;gap:3px;margin-top:7px}.diag-bar{width:7px;background:var(--accent);border-radius:3px 3px 0 0}.friendly-timeline{display:flex;flex-direction:column;gap:4px;margin-top:7px;max-height:145px;overflow:auto}.friendly-event{display:flex;gap:7px;padding:6px 7px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:10px}.friendly-event-time{min-width:50px;color:var(--muted)}
+.status-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(720px,calc(100% - 28px));max-height:calc(100vh - 94px);overflow:auto;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}.status-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.status-card{min-height:72px;padding:10px;background:var(--surface-2);border:1px solid var(--border);border-radius:11px}.status-card.wide{grid-column:1/-1}.status-icon{float:left;margin-right:8px;font-size:22px}.status-icon.good{color:var(--success)}.status-icon.warn{color:#ff9f0a}.status-icon.bad{color:var(--danger)}.status-small{margin-top:3px;font-size:10px;color:var(--muted)}.friendly-people-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}.friendly-person{display:flex;align-items:center;gap:5px;padding:5px 8px;background:var(--surface);border:1px solid var(--border);border-radius:14px;font-size:10px}.friendly-dot{width:7px;height:7px;border-radius:50%}.friendly-state{font-size:9px;color:var(--muted)}.health-line{display:flex;align-items:center;gap:7px;font-size:11px;margin-top:7px}.health-dot{width:9px;height:9px;border-radius:50%;background:var(--success)}.status-actions{display:flex;justify-content:flex-end;margin-top:9px}.status-actions button{background:var(--accent);color:#fff;border:0;border-radius:9px;padding:8px 11px;font-size:10px;font-weight:650}
+.poll-card,.countdown-card{max-width:360px;margin-top:5px;padding:11px;background:var(--surface);border:1px solid var(--border);border-radius:15px;box-shadow:0 2px 6px rgba(0,0,0,.05)}.poll-question{margin-bottom:8px;font-weight:700;font-size:13px}.poll-option{display:flex;gap:6px;margin:5px 0}.poll-option button{position:relative;flex:1;overflow:hidden;text-align:left;padding:8px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:9px;font-size:10px}.poll-option button span{position:relative;z-index:1}.poll-bar{position:absolute;inset:0 auto 0 0;width:0;background:var(--accent-soft);transition:width .25s}.poll-meta{margin-top:6px;font-size:9px;color:var(--muted)}.countdown-label{font-size:10px;color:var(--muted)}.countdown-time{font-size:28px;font-weight:750;letter-spacing:1px}
+#about{display:none;position:fixed;inset:0;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.45);z-index:110}.about-box{width:min(520px,100%);padding:20px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}.about-box h2{margin:0 0 9px;font-size:19px}.about-box p{font-size:12px;line-height:1.55;color:var(--muted)}.about-close{float:right;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);color:var(--text);padding:6px 9px;font-size:10px}
+#whiteboard{display:none;position:fixed;inset:0;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.55);z-index:120}.whiteboard-box{display:flex;flex-direction:column;overflow:hidden;width:min(1000px,96vw);height:min(760px,92vh);background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}.whiteboard-head{display:flex;align-items:center;gap:7px;padding:9px 11px;border-bottom:1px solid var(--border)}.whiteboard-head>div{flex:1}.whiteboard-head strong{font-size:13px}.whiteboard-note{margin-top:2px;color:var(--muted);font-size:10px}.whiteboard-head button{padding:6px 8px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:10px}.whiteboard-canvas-wrap{position:relative;flex:1;min-height:0;background:#fff}.whiteboard-canvas{display:block;width:100%;height:100%;cursor:crosshair}.cursor-layer{position:absolute;inset:0;pointer-events:none}.shared-cursor{position:absolute;padding:2px 5px;border-radius:6px;background:var(--accent);color:#fff;font:10px Arial,sans-serif;transform:translate(8px,8px);white-space:nowrap}
+
+@media(max-width:760px){header{padding:0 12px}.header-room{display:none}.brand{min-width:0}.utility .nav-btn,.utility #aboutBtn,.utility #settingsBtn{width:34px;padding:0;font-size:0}.utility .nav-btn:before{font-size:15px}.utility .nav-btn:first-child:before{content:'♙'}.utility .nav-btn:nth-child(2):before{content:'●'}.utility .nav-btn:nth-child(3):before{content:'⌘'}.utility #aboutBtn:before{content:'ⓘ';font-size:15px}.utility #settingsBtn:before{content:'⚙';font-size:14px}#name{width:90px}.message-group{max-width:86%}.friendly-box{top:8px;right:8px;bottom:8px;width:min(360px,calc(100% - 16px))}}
+@media(max-width:520px){#namebar{margin-left:1px;padding-left:4px}#people{display:none}.brand-mark{width:31px;height:31px;border-radius:9px}.brand{gap:7px}.brand-text .subtitle{display:none}.utility{gap:2px}#messages{padding-left:12px;padding-right:12px}.members-bar{padding-left:12px;padding-right:12px}.typing-wrap,.reply-preview{padding-left:12px;padding-right:12px}form{padding-left:12px;padding-right:12px}.status-grid{grid-template-columns:1fr}.status-card.wide{grid-column:auto}}
+
+/* Offline compressed image messaging */
+.image-attach-btn{display:grid;place-items:center;flex:0 0 32px;width:32px;height:32px;margin-left:3px;border:0;border-radius:50%;background:transparent;color:var(--muted);padding:0}.image-attach-btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.image-attach-btn:hover{background:var(--surface-3);color:var(--text)}
+.image-preview-panel{display:none;align-items:center;gap:10px;padding:9px max(18px,calc((100vw - 920px)/2));border-top:1px solid var(--border);background:var(--surface-2)}
+.image-preview-panel.visible{display:flex}
+.image-preview-panel>img{width:54px;height:54px;object-fit:contain;border-radius:8px;background:var(--surface-3);border:1px solid var(--border)}
+.image-preview-details{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}.image-preview-details strong{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.image-preview-details span{font-size:10px;color:var(--muted)}
+.image-preview-actions{display:flex;gap:6px;align-items:center}.image-preview-actions button{height:32px;padding:0 11px;border-radius:9px;font-size:10px;font-weight:650}
+.image-cancel-btn{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.image-send-btn{background:var(--accent);color:#fff;border:1px solid var(--accent)}.image-send-btn:disabled{opacity:.55;cursor:wait}
+.image-progress{display:inline-flex;align-items:center;gap:6px}.image-progress:before{content:'';width:9px;height:9px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:imageSpin .7s linear infinite}@keyframes imageSpin{to{transform:rotate(360deg)}}
+.message-image{display:block;width:auto;height:auto;max-width:min(300px,65vw);max-height:280px;object-fit:contain;border-radius:13px;cursor:zoom-in;background:var(--surface-3)}
+.image-bubble{padding:5px!important;overflow:hidden}.image-caption{font-size:12px;line-height:1.35;padding:6px 8px 4px;white-space:pre-wrap;overflow-wrap:anywhere}
+.image-error{font-size:11px;color:var(--danger);padding:8px 10px}
+.image-viewer{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.88);align-items:center;justify-content:center;padding:50px 24px 24px}.image-viewer.open{display:flex}.image-viewer img{max-width:min(96vw,1500px);max-height:90vh;object-fit:contain;box-shadow:0 15px 60px #0008}.image-viewer-close{position:absolute;top:14px;right:16px;width:38px;height:38px;border:1px solid #ffffff55;border-radius:50%;background:#202124;color:#fff;font-size:20px}
+#messages.drop-target{outline:2px dashed var(--accent);outline-offset:-8px;background:var(--accent-soft)}
+.settings-row select{max-width:145px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:10px}
+/* Diagnostics view is retained as a secondary panel */
+.debug-panel{display:none;position:fixed;inset:64px 0 0;z-index:85;background:#080a0d;color:#d8e0e8;font:12px Consolas,Monaco,monospace;flex-direction:column;overflow:auto}
+.debug-panel.open{display:flex}.debug-head{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid #29313a;background:#0e1217;flex-shrink:0}.debug-head strong{color:#fff;margin-right:auto}.debug-head button,.diag-tools button{background:#1a222b;color:#d8e0e8;border:1px solid #35404b;border-radius:7px;padding:6px 9px;font:11px Consolas,monospace}.debug-stats{color:#8fa0af}.network-lab{display:grid;grid-template-columns:repeat(4,minmax(100px,1fr));gap:7px;padding:8px 10px;border-bottom:1px solid #29313a;background:#0b0f14;flex-shrink:0}.net-card{background:#111820;border:1px solid #26323e;border-radius:8px;padding:7px;min-width:0}.net-label{font-size:10px;color:#7f8c99}.net-value{font-size:14px;color:#e6edf3;font-weight:bold;margin-top:2px}.net-peers{grid-column:1/-1}.net-peer{display:inline-flex;gap:5px;align-items:center;margin:4px 6px 0 0;padding:3px 6px;border-radius:8px;background:#17212b;font-size:11px}.net-peer-dot{width:6px;height:6px;border-radius:50%;background:#35b86b}.diag-tools{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}.diag-result{font-size:10px;color:#8fa0af;margin-top:7px;white-space:pre-wrap}.diag-breakdown{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}.diag-tag{padding:3px 6px;border-radius:7px;background:#17212b;color:#aebdca;font-size:10px}.diag-bars{display:flex;align-items:flex-end;gap:3px;height:45px;margin-top:7px}.diag-bar{width:7px;background:#35b86b;border-radius:2px 2px 0 0;min-height:2px}.diag-acks{font-size:10px;color:#aebdca;margin-top:6px;max-height:100px;overflow:auto}.diag-ack{display:flex;justify-content:space-between;padding:3px 5px;border-bottom:1px solid #18212a}.debug-log{flex:1;min-height:120px;overflow:auto;padding:8px}.debug-entry{border-bottom:1px solid #151b21;padding:5px 4px;white-space:pre-wrap;overflow-wrap:anywhere}.debug-entry .time{color:#71808e}.debug-entry .kind{font-weight:bold;margin:0 6px}.debug-entry.info .kind{color:#6cb6ff}.debug-entry.ws .kind{color:#d2a8ff}.debug-entry.in .kind{color:#56d364}.debug-entry.out .kind{color:#f0883e}.debug-entry.error .kind{color:#ff7b72}.debug-entry.state .kind{color:#e3b341}.debug-json{color:#b8c5d1}
+@media(max-width:760px){.image-preview-panel{padding-left:12px;padding-right:12px}.image-preview-actions button{padding:0 8px}.network-lab{grid-template-columns:repeat(2,minmax(90px,1fr))}}
+
+/* Consistent full-height navigation tabs */
+header{height:64px;flex:0 0 64px;padding:0 16px}
+.utility{height:64px;align-items:stretch;gap:0}
+.nav-btn,.utility #aboutBtn,.utility #settingsBtn{height:64px;border:0;border-radius:0;padding:0 13px;display:flex;align-items:center;justify-content:center;background:transparent;color:var(--muted);font-size:11px;font-weight:650}
+.nav-btn:hover,.utility #aboutBtn:hover,.utility #settingsBtn:hover,.nav-btn.active{background:var(--accent-soft);color:var(--text)}
+.nav-btn.active{box-shadow:inset 0 -3px 0 var(--accent)}
+#namebar{height:64px;align-items:center;margin-left:6px;padding-left:10px}
+#theme,#mode{min-height:34px}
+@media(max-width:760px){.utility .nav-btn,.utility #aboutBtn,.utility #settingsBtn{height:64px;width:auto;min-width:34px;padding:0 9px;font-size:0}.utility .nav-btn:before{font-size:15px}.utility .nav-btn:first-child:before{content:'♙'}.utility .nav-btn:nth-child(2):before{content:'●'}.utility .nav-btn:nth-child(3):before{content:'⌘'}.utility #aboutBtn:before{content:'ⓘ';font-size:15px}.utility #settingsBtn:before{content:'⚙';font-size:14px}}
+body.dark:not(.theme-blue):not(.theme-green):not(.theme-purple):not(.theme-red):not(.theme-orange):not(.theme-pink):not(.theme-cyan):not(.theme-yellow) form>button[type=submit]{background:#e8e8eb!important;color:#111!important}
+
+/* Software updater */
+.update-settings-row{align-items:flex-start}.update-status{margin-top:4px;font-size:10px;line-height:1.4;color:var(--muted);overflow-wrap:anywhere}.update-last-check{margin-top:3px;font-size:9px;color:var(--muted)}.update-buttons{justify-content:flex-start;gap:7px}.update-action{min-height:30px;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:10px;font-weight:650}.update-action.primary{background:var(--accent);border-color:var(--accent);color:#fff}.update-action:disabled{opacity:.55;cursor:wait}.update-action[hidden]{display:none!important}
+/* In-chat camera */
+.camera-attach-btn{margin-left:0}
+.camera-modal{display:none;position:fixed;inset:0;z-index:220;align-items:center;justify-content:center;padding:14px;background:rgba(0,0,0,.78);backdrop-filter:blur(5px)}
+.camera-modal.open{display:flex}
+.camera-card{display:flex;flex-direction:column;gap:12px;width:min(620px,100%);max-height:calc(100dvh - 28px);padding:14px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:18px;box-shadow:0 22px 70px #0008;overflow:auto}
+.camera-head{display:flex;align-items:center;gap:12px}.camera-head>div{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px}.camera-head strong{font-size:16px}.camera-head span{font-size:10px;color:var(--muted)}
+.camera-head>button{width:34px;height:34px;border:1px solid var(--border);border-radius:50%;background:var(--surface-2);color:var(--text);font-size:17px}
+.camera-stage{position:relative;display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:4/3;max-height:min(58vh,560px);overflow:hidden;border-radius:13px;background:#090b0e}
+.camera-stage[hidden],.camera-actions [hidden]{display:none!important}
+.camera-stage video,.camera-stage img{display:block;width:100%;height:100%;object-fit:contain}
+.camera-stage video.camera-selfie{transform:scaleX(-1)}
+.camera-shot-stage{background:#050607}.camera-shot-stage img{object-fit:contain}
+.camera-live-label{position:absolute;top:10px;left:10px;padding:5px 8px;border-radius:7px;background:#0009;color:#fff;font-size:9px;letter-spacing:.1em;font-weight:750;pointer-events:none}
+.camera-live-label:before{content:'';display:inline-block;width:6px;height:6px;margin-right:6px;border-radius:50%;background:#ff4545;vertical-align:1px}
+.camera-status{min-height:17px;color:var(--muted);font-size:11px;text-align:center}
+.camera-actions{display:flex;align-items:center;gap:8px}.camera-action-spacer{flex:1}
+.camera-actions button{min-height:38px;padding:0 14px;border-radius:11px;font-size:11px;font-weight:700}
+.camera-secondary{background:var(--surface-2);color:var(--text);border:1px solid var(--border)}
+.camera-primary{background:var(--accent);color:#fff;border:1px solid var(--accent)}
+.camera-actions button:disabled{opacity:.5;cursor:wait}
+@media(max-width:520px){.camera-modal{padding:8px}.camera-card{padding:11px;border-radius:15px;gap:10px;max-height:calc(100dvh - 16px)}.camera-stage{aspect-ratio:3/4;max-height:58vh}.camera-actions button{padding:0 11px}}
+</style></head><body>
+<header>
+  <div class="brand"><div class="brand-mark">P</div><div class="brand-text"><div id="title">Party Chat</div><div class="subtitle">Public room</div><div id="status">Connecting…</div></div></div>
+  <div class="header-room"><strong>Party Chat</strong><span>Public room · live chat</span></div>
+  <div class="utility">
+    <button id="peopleBtn" class="nav-btn" title="See who's here">People &amp; Activity</button>
+    <button id="statusBtn" class="nav-btn" title="Connection status">Status</button>
+    <button id="debugBtn" class="nav-btn" title="Detailed diagnostics">Diagnostics</button>
+    <button id="aboutBtn" title="About Party Chat">About</button>
+    <button id="settingsBtn" title="Settings">Settings</button>
+    <div id="namebar"><input id="name" maxlength="24" placeholder="Your name" autocomplete="off"><span id="people">0 online</span></div>
+  </div>
+</header>
+
+<div id="settingsPanel" class="settings-popover">
+  <div class="settings-title">Party Chat settings</div>
+  <div class="settings-row"><span>App version</span><strong id="updateInstalledVersion" style="font-size:11px;font-weight:650">v1.0.1</strong></div>
+  <div class="settings-row update-settings-row"><div style="min-width:0;flex:1"><div style="font-size:11px;font-weight:650">Software updates</div><div id="updateStatus" class="update-status" role="status" aria-live="polite">Automatic update checks are enabled.</div><div id="updateLastCheck" class="update-last-check">Not checked yet</div></div></div>
+  <div class="settings-row update-buttons"><button type="button" id="checkUpdatesBtn" class="update-action">Check now</button><button type="button" id="applyUpdateBtn" class="update-action primary" hidden>Restart to update</button></div>
+  <div class="settings-row"><span>Colour</span><select id="theme" aria-label="Theme"><option value="default">Classic blue</option><option value="blue">Blue</option><option value="green">Green</option><option value="purple">Purple</option><option value="red">Red</option><option value="orange">Orange</option><option value="pink">Pink</option><option value="cyan">Cyan</option><option value="yellow">Yellow</option></select></div>
+  <div class="settings-row"><span>Appearance</span><button id="mode" type="button">☾ Dark</button></div><div class="settings-row"><span>Image quality</span><strong style="font-size:11px;font-weight:650">Automatic · maximum</strong></div><div class="settings-row"><span style="color:var(--muted);font-size:10px">Original images are kept when they fit. Larger images are compressed to the highest practical quality for the WebSocket frame limit.</span></div>
+  <div class="settings-row"><span style="color:var(--muted);font-size:10px">Your name and chat history are saved only in this browser.</span></div>
+</div>
+
+<div id="peoplePanel" class="friendly-panel"><div class="friendly-box"><div class="friendly-head"><div><strong>People &amp; Activity</strong><div class="status-sub">Everyone currently connected to this room.</div></div><button id="peopleClose" class="panel-close">Close</button></div><div id="peopleCards" class="people-cards"></div><div class="activity-grid combined-activity"><div class="activity-card"><div class="status-label">Messages</div><div class="status-big" id="activityMessages">0</div></div><div class="activity-card"><div class="status-label">Reactions</div><div class="status-big" id="activityReactions">0</div></div><div class="activity-card"><div class="status-label">People</div><div class="status-big" id="activityPeople">0</div></div><div class="activity-card"><div class="status-label">Peak online</div><div class="status-big" id="activityPeak">0</div></div><div class="activity-card wide"><div class="status-label">Most active</div><div id="activityMostActive" class="activity-list"></div></div><div class="activity-card wide"><div class="status-label">Room activity</div><div id="activityBars" class="activity-bars"></div></div><div class="activity-card wide"><div class="status-label">Recent activity</div><div id="activityTimeline" class="friendly-timeline"></div></div></div></div></div>
+
+<div id="statusPanel" class="status-panel"><div class="status-box"><div class="status-head"><div><strong>Room status</strong><div class="status-sub">A simple overview of your connection and this room.</div></div><button id="statusClose" class="panel-close">Close</button></div><div class="status-grid"><div class="status-card wide"><div class="status-icon" id="friendlyConnectionIcon">●</div><div><div class="status-label">Connection</div><div class="status-big" id="friendlyConnection">Connecting…</div><div class="status-small" id="friendlyConnectionDetail">Connecting to the chat relay</div></div></div><div class="status-card"><div class="status-label">People online</div><div class="status-big" id="friendlyPeople">0</div><div class="status-small">currently connected</div></div><div class="status-card"><div class="status-label">Message delivery</div><div class="status-big" id="friendlyDelivery">—</div><div class="status-small">recent confirmations</div></div><div class="status-card"><div class="status-label">Response time</div><div class="status-big" id="friendlyLatency">—</div><div class="status-small">average round trip</div></div><div class="status-card"><div class="status-label">Connection time</div><div class="status-big" id="friendlyUptime">0s</div><div class="status-small">since this tab connected</div></div><div class="status-card wide"><div class="status-label">People</div><div id="friendlyPeopleList" class="friendly-people-list"></div></div><div class="status-card wide"><div class="status-label">Recent activity</div><div id="friendlyTimeline" class="friendly-timeline"></div></div><div class="status-card wide"><div class="status-label">Room health</div><div id="friendlyHealth" class="health-line"><span class="health-dot"></span><span>Checking…</span></div></div></div><div class="status-actions"><button id="statusCopy">Copy summary</button><button id="statusDiagnostics" style="display:none">Diagnostics</button></div></div></div>
+
+<div id="debugPanel" class="debug-panel"><div class="debug-head"><strong>DIAGNOSTICS</strong><button id="debugClear">Clear</button><button id="debugCopy">Copy log</button><button id="debugClose" class="panel-close">✕ Close</button><span id="debugStats" class="debug-stats">0 events</span></div><div class="network-lab"><div class="net-card"><div class="net-label">WebSocket</div><div class="net-value" id="netState">—</div></div><div class="net-card"><div class="net-label">Uptime</div><div class="net-value" id="netUptime">—</div></div><div class="net-card"><div class="net-label">Messages</div><div class="net-value" id="netMessages">0</div></div><div class="net-card"><div class="net-label">Events / sec</div><div class="net-value" id="netRate">0</div></div><div class="net-card"><div class="net-label">Delivery RTT</div><div class="net-value" id="netRtt">—</div></div><div class="net-card"><div class="net-label">Reconnects</div><div class="net-value" id="netReconnects">0</div></div><div class="net-card"><div class="net-label">Last heartbeat</div><div class="net-value" id="netHeartbeat">—</div></div><div class="net-card"><div class="net-label">Local history</div><div class="net-value" id="netHistory">0</div></div><div class="net-card net-peers"><div class="net-label">Connected clients</div><div id="netPeers"></div></div><div class="net-card"><div class="net-label">FPS</div><div class="net-value" id="netFps">—</div></div><div class="net-card"><div class="net-label">DOM nodes</div><div class="net-value" id="netDom">—</div></div><div class="net-card"><div class="net-label">Traffic</div><div class="net-value" id="netTraffic">—</div></div><div class="net-card"><div class="net-label">Delivery</div><div class="net-value" id="netDelivery">—</div></div><div class="net-card net-peers"><div class="net-label">Event breakdown</div><div id="netBreakdown" class="diag-breakdown"></div></div><div class="net-card net-peers"><div class="net-label">Population history</div><div id="netPopulation" class="diag-bars"></div></div><div class="net-card net-peers"><div class="net-label">Message acknowledgements</div><div id="netAcks" class="diag-acks"></div></div><div class="net-card net-peers"><div class="net-label">Diagnostics tools</div><div class="diag-tools"><button id="diagPing">Ping room</button><button id="diagStress">Stress test</button><button id="diagPacket">Packet test</button><button id="diagDisconnect">Simulate disconnect</button><button id="diagIncident">Save incident report</button><button id="diagExport">Export diagnostics</button></div><div id="diagResult" class="diag-result">Ready.</div></div></div><div id="debugLog" class="debug-log"></div></div>
+
+<div id="messages"></div>
+<div id="about"><div class="about-box"><button class="about-close" id="aboutClose">Close</button><h2>About Party Chat</h2><p>Party Chat is a browser-based public chat room designed to let people join without an account or app installation.</p><p>Your browser connects to the existing encrypted WebSocket relay. Text, replies, reactions, presence, polls, countdowns, whiteboard events and images are sent through that same connection to other people in the room.</p><p>Images are prepared locally at the highest practical quality that fits the WebSocket frame limit. They are not uploaded to an image-hosting service, and the encoded data is never shown as chat text.</p><p>Your chosen name and local chat history are stored only in this browser.</p></div></div>
+<div class="typing-wrap"><div id="typing" class="typing-bubble"></div></div>
+<div class="members-bar"><span class="members-label">ONLINE</span><div id="memberList" class="member-list"></div></div>
+<div id="replyPreview" class="reply-preview"><span id="replyText"></span><button id="cancelReply">Cancel</button></div>
+<div id="imagePreviewPanel" class="image-preview-panel" aria-live="polite"><img id="imagePreviewThumb" alt="Selected image preview"><div class="image-preview-details"><strong id="imagePreviewName">Image selected</strong><span id="imagePreviewStatus">Ready to send</span></div><div class="image-preview-actions"><button type="button" id="imageCancelBtn" class="image-cancel-btn">Cancel</button><button type="button" id="imageSendBtn" class="image-send-btn">Send image</button></div></div>
+<form id="form"><div class="compose-shell"><input id="text" maxlength="1000" autocomplete="off" placeholder="Message…"><button type="button" id="imageBtn" class="image-attach-btn" title="Send a photo" aria-label="Send a photo"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.25" y="4.25" width="17.5" height="15.5" rx="2.25"></rect><circle cx="8.5" cy="9" r="1.5"></circle><path d="m4.5 17 5-5 3.1 3.1 2.4-2.4 4.5 4.5"></path></svg></button><input id="imageFileInput" type="file" accept="image/*" hidden><button type="button" id="cameraBtn" class="image-attach-btn camera-attach-btn" title="Take a photo" aria-label="Take a photo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5h3l1.4-2h7.2l1.4 2h3A1.5 1.5 0 0 1 21.5 9v9A1.5 1.5 0 0 1 20 19.5H4A1.5 1.5 0 0 1 2.5 18V9A1.5 1.5 0 0 1 4 7.5Z"></path><circle cx="12" cy="13.2" r="3.6"></circle></svg></button><input id="cameraFallbackInput" type="file" accept="image/*" capture="environment" hidden><div class="tools-wrap"><button type="button" id="toolsBtn" title="More options">＋</button><div id="toolsPanel" class="tools-panel"><h3>More from Party Chat</h3><div class="tools-grid"><button type="button" id="tempBtn">Temporary message</button><button type="button" id="pollBtn">Create a poll</button><button type="button" id="countBtn">Countdown</button><button type="button" id="boardBtn">Shared whiteboard</button></div><div class="tool-section"><label>Temporary message duration</label><select id="tempDuration"><option value="10000">10 seconds</option><option value="30000">30 seconds</option><option value="60000">1 minute</option><option value="300000">5 minutes</option></select></div></div></div></div><button type="submit">Send</button></form>
+<div id="profilePop" class="profile-pop"></div>
+<div id="whiteboard"><div class="whiteboard-box"><div class="whiteboard-head"><div><strong>Shared whiteboard</strong><div class="whiteboard-note">Everyone needs to have the whiteboard open to see the live drawing.</div></div><button id="clearBoard">Clear</button><button id="closeBoard">Close</button></div><div class="whiteboard-canvas-wrap"><canvas id="boardCanvas" class="whiteboard-canvas"></canvas><div id="cursorLayer" class="cursor-layer"></div></div></div></div>
+<div id="cameraModal" class="camera-modal" role="dialog" aria-modal="true" aria-labelledby="cameraTitle" aria-hidden="true">
+  <div class="camera-card">
+    <div class="camera-head"><div><strong id="cameraTitle">Take a photo</strong><span>Capture a photo and send it straight to the chat.</span></div><button type="button" id="cameraClose" aria-label="Close camera">✕</button></div>
+    <div id="cameraLiveStage" class="camera-stage"><video id="cameraVideo" autoplay playsinline muted></video><div class="camera-live-label">LIVE CAMERA</div></div>
+    <div id="cameraShotStage" class="camera-stage camera-shot-stage" hidden><img id="cameraShotPreview" alt="Captured photo preview"></div>
+    <div id="cameraStatus" class="camera-status" role="status" aria-live="polite">Starting camera…</div>
+    <div class="camera-actions"><button type="button" id="cameraSwitch" class="camera-secondary">Flip camera</button><span class="camera-action-spacer"></span><button type="button" id="cameraRetake" class="camera-secondary" hidden>Retake</button><button type="button" id="cameraCapture" class="camera-primary">Capture photo</button><button type="button" id="cameraUse" class="camera-primary" hidden>Use photo</button></div>
+  </div>
+</div>
+<div id="imageViewer" class="image-viewer" role="dialog" aria-modal="true" aria-label="Image preview"><button type="button" id="imageViewerClose" class="image-viewer-close" aria-label="Close image">✕</button><img id="imageViewerImage" alt="Expanded shared image"></div>
+<script>
+const ROUTER='wss://router.metapage.io/';
+const CHANNEL='public-chat-v1';
+const LEGACY_BRIDGE='https://ntfy.sh/party-chat-ie11-7x4p92qk-v1';
+let ws=null,name=localStorage.getItem('simplechat-name')||'',avatar='😀',clientId=sessionStorage.getItem('simplechat-client-id')||crypto.randomUUID();sessionStorage.setItem('simplechat-client-id',clientId);
+const members=new Map();let memberTimer=null;const typingUsers=new Map();let replyTo=null;const HISTORY_KEY='simplechat-history-v2';
+const network={started:Date.now(),reconnects:0,msgs:0,events:0,lastEvent:Date.now(),rtt:[],lastHeartbeat:0};
+const diag={timeline:[],latencyByClient:new Map(),sentAt:new Map(),delivered:0,deliveryTotal:0,seen:0,seenTotal:0,packetTests:[],stress:0,incident:[],eventCounts:{},population:[],messageAcks:new Map(),fps:60,fpsFrames:0,fpsLast:performance.now()};
+const seenMessages=new Set(), pendingDelivery=new Map(), pollState=new Map(), countdownTimers=new Map();
+let idleState='online', lastActivity=Date.now(), boardOpen=false, boardDrawing=false, boardLast=null, boardCtx=null;
+// Relay compatibility specification permits at least 256 KiB per WebSocket frame.
+// Keep an 8 KiB margin for relay/proxy differences and JSON framing.
+const MAX_WEBSOCKET_FRAME_BYTES=256*1024;
+const MAX_IMAGE_FRAME_BYTES=248*1024;
+const LEGACY_IMAGE_CODE_LIMIT=850;
+const DIRECT_IMAGE_MIMES=new Set(['image/jpeg','image/png','image/webp','image/gif','image/avif','image/bmp']);
+const IMAGE_MIME_ALLOWLIST=new Set(['image/jpeg','image/png','image/webp','image/gif','image/avif','image/bmp']);
+const utf8Encoder=new TextEncoder();
+let pendingImageFile=null,pendingImageUrl='',imageSendBusy=false;
+const $=id=>document.getElementById(id);$('name').value=name;
+const debugState={enabled:false,events:[],started:Date.now(),seq:0};
+function debugLog(kind,message,data){network.events++;network.lastEvent=Date.now();diag.eventCounts[kind]=(diag.eventCounts[kind]||0)+1;if(!debugState.enabled)return;const now=new Date();const entry={seq:++debugState.seq,time:now.toISOString(),kind,message,data:data===undefined?null:data};debugState.events.push(entry);diag.timeline.push(entry);if(diag.timeline.length>100)diag.timeline.shift();if(debugState.events.length>5000)debugState.events.shift();const el=document.createElement('div');el.className='debug-entry '+kind.toLowerCase();const time=now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit',fractionalSecondDigits:3});let payload='';if(data!==undefined){try{payload='\n'+JSON.stringify(data,null,2)}catch{payload='\n'+String(data)}}el.innerHTML='<span class="time">['+time+'] #'+entry.seq+'</span><span class="kind">'+String(kind).toUpperCase()+'</span><span>'+escapeDebug(message)+'</span><span class="debug-json">'+escapeDebug(payload)+'</span>';$('debugLog').appendChild(el);$('debugLog').scrollTop=$('debugLog').scrollHeight;$('debugStats').textContent=debugState.events.length+' events';}
+function escapeDebug(v){return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function debugSnapshot(){return {time:new Date().toISOString(),clientId,name,channel:CHANNEL,router:ROUTER,readyState:ws?['CONNECTING','OPEN','CLOSING','CLOSED'][ws.readyState]:'NO_SOCKET',members:[...members.values()],typing:[...typingUsers.values()],replyTo,theme:themeSelect?.value,dark:document.body.classList.contains('dark'),historyCount:(()=>{try{return JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]').length}catch{return'error'}})()}}
+function setActiveTab(id){document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));const map={peoplePanel:'peopleBtn',statusPanel:'statusBtn',debugPanel:'debugBtn'};if(map[id])$(map[id])?.classList.add('active')}
+function debugEnable(){closePanels();debugState.enabled=true;$('debugPanel').classList.add('open');setActiveTab('debugPanel');debugLog('STATE','Diagnostics mode enabled',debugSnapshot());debugLog('INFO','Diagnostic capture records WebSocket traffic, presence, typing, messages, reactions, delivery acknowledgements, UI actions, timers and errors.');}
+function debugDisable(){$('debugPanel').classList.remove('open');debugState.enabled=false;if(!$('statusPanel').classList.contains('open')&&!$('peoplePanel').classList.contains('open'))setActiveTab('')}
+function closePanels(){['peoplePanel','statusPanel','debugPanel'].forEach(id=>$(id)?.classList.remove('open'));setActiveTab('')}
+function openPanel(id){closePanels();$(id).classList.add('open');setActiveTab(id)}
+$('peopleBtn').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const panel=$('peoplePanel');if(panel.classList.contains('open')){closePanels();debugLog('DOM','People & Activity panel closed');return}openPanel('peoplePanel');try{renderPeoplePanel();updateActivityPanel();debugLog('DOM','People & Activity panel opened')}catch(err){debugLog('ERROR','People & Activity panel render error',{message:String(err),stack:err?.stack||''});}});$('peopleClose').onclick=()=>closePanels();document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanels()});
+function renderPeoplePanel(){const el=$('peopleCards');el.innerHTML='';const list=[...members.values()].sort((a,b)=>(a.name||'').localeCompare(b.name||''));if(!list.length){el.innerHTML='<div class="people-card">No other users are currently connected.</div>';return}list.forEach(m=>{const c=document.createElement('div');c.className='people-card';const top=document.createElement('div');top.className='people-card-top';const dot=document.createElement('span');dot.className='people-card-dot';dot.style.background=m.state==='idle'?'#e3b341':(m.id===clientId?'var(--accent)':colorFor(m.name||'Anonymous'));const n=document.createElement('div');n.className='people-card-name';n.textContent=m.name||'Anonymous';top.append(dot,n);const st=document.createElement('div');st.className='people-card-state';st.textContent=m.state==='idle'?'Idle':'Online';const stats=document.createElement('div');stats.className='people-card-stats';const msgCount=([...diag.timeline].filter(e=>e.kind==='MESSAGE'&&e.data?.name===(m.name||'Anonymous')).length);stats.innerHTML='<span>'+msgCount+' messages</span><span>Joined '+new Date(m.joined||Date.now()).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})+'</span>';c.append(top,st,stats);c.onclick=()=>showProfile(m,c);el.appendChild(c)})}
+function updateActivityPanel(){const messages=diag.timeline.filter(e=>e.kind==='MESSAGE').length;const reactions=diag.timeline.filter(e=>e.kind==='REACTION').length; $('activityMessages').textContent=messages||network.msgs;$('activityReactions').textContent=reactions;$('activityPeople').textContent=members.size;$('activityPeak').textContent=Math.max(members.size,...diag.population.map(x=>x.count||0),0);const counts={};for(const e of diag.timeline){if(e.kind==='MESSAGE'&&e.data?.name)counts[e.data.name]=(counts[e.data.name]||0)+1}const ml=$('activityMostActive');ml.innerHTML='';const vals=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,8);if(!vals.length)ml.innerHTML='<div class="status-small">No messages recorded yet.</div>';const max=Math.max(...vals.map(x=>x[1]),1);for(const [n,v] of vals){const r=document.createElement('div');r.className='activity-row';r.innerHTML='<span>'+escapeDebug(n)+'</span><span class="activity-bar" style="width:'+Math.max(6,Math.round(v/max*100))+'%"></span><span>'+v+'</span>';ml.appendChild(r)}const bars=$('activityBars');bars.innerHTML='';const hist=diag.population.slice(-24);hist.forEach(x=>{const b=document.createElement('div');b.style.cssText='width:10px;height:'+Math.max(4,Math.min(100,(x.count||0)*18))+'%;background:var(--accent);opacity:.7;border-radius:4px 4px 0 0';bars.appendChild(b)});const tl=$('activityTimeline');tl.innerHTML='';diag.timeline.slice(-12).reverse().forEach(e=>{const row=document.createElement('div');row.className='friendly-event';row.innerHTML='<span class="friendly-event-time">'+new Date(e.time).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'})+'</span><span>'+escapeDebug(e.kind.toLowerCase())+' — '+escapeDebug(e.message)+'</span>';tl.appendChild(row)})}
+if($('debugBtn'))$('debugBtn').onclick=()=>{if(debugState.enabled)debugDisable();else debugEnable()};if($('debugClose'))$('debugClose').onclick=debugDisable;if($('debugClear'))$('debugClear').onclick=()=>{debugState.events=[];$('debugLog').innerHTML='';$('debugStats').textContent='0 events';debugLog('INFO','Log cleared')};if($('debugCopy'))$('debugCopy').onclick=async()=>{const out=debugState.events.map(e=>JSON.stringify(e)).join('\n');try{await navigator.clipboard.writeText(out);debugLog('DOM','Full debug log copied to clipboard',{events:debugState.events.length})}catch(e){debugLog('ERROR','Clipboard copy failed',String(e))}};
+window.addEventListener('error',e=>debugLog('ERROR','Window error',{message:e.message,source:e.filename,line:e.lineno,column:e.colno}));window.addEventListener('unhandledrejection',e=>debugLog('ERROR','Unhandled promise rejection',String(e.reason)));document.addEventListener('visibilitychange',()=>debugLog('DOM','Visibility changed',{hidden:document.hidden}));
+$('name').value=name;
+function system(t){const e=document.createElement('div');e.className='system';e.textContent=t;$('messages').appendChild(e);$('messages').scrollTop=$('messages').scrollHeight}
+const colors=['#e53935','#8e24aa','#3949ab','#00897b','#43a047','#fb8c00','#6d4c41','#00838f','#5e35b1','#c2185b'];
+const nameColors={};
+function colorFor(name){if(nameColors[name])return nameColors[name];let h=0;for(let i=0;i<name.length;i++)h=(h*31+name.charCodeAt(i))>>>0;return nameColors[name]=colors[h%colors.length]}
+function saveHistory(d){try{let h=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');h.push(d);if(h.length>200)h=h.slice(-200);let packed=JSON.stringify(h);while(h.length>1&&packed.length>1_500_000){h.shift();packed=JSON.stringify(h)}localStorage.setItem(HISTORY_KEY,packed)}catch{}}
+function closeReactionPicker(){document.querySelectorAll('.reaction-picker.open').forEach(x=>x.classList.remove('open'))}
+window.addEventListener('resize',closeReactionPicker);window.addEventListener('scroll',closeReactionPicker,true);window.addEventListener('keydown',e=>{if(e.key==='Escape')closeReactionPicker()});
+// High-quality offline image transport (pcimg-v2).
+// The new format carries browser-encoded image bytes inside the existing msg event.
+// Keep the PC850 decoder below solely for images sent by older Party Chat clients.
+function bytesToBase64(bytes){
+  let binary='';
+  for(let i=0;i<bytes.length;i+=0x8000)binary+=String.fromCharCode(...bytes.subarray(i,Math.min(i+0x8000,bytes.length)));
+  return btoa(binary);
+}
+function base64ToBytes(code){
+  const binary=atob(code),bytes=new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+  return bytes;
+}
+function utf8Length(value){return utf8Encoder.encode(value).byteLength}
+function imagePayloadBudget(message){
+  // Reserve space for the longest metadata values; the actual frame is checked again before send.
+  const skeleton={...message,image:{format:'pcimg-v2',mime:'image/svg+xml',data:'',width:100000,height:100000,bytes:1000000,quality:0.123456789,compression:'lossless-png'}};
+  const available=MAX_IMAGE_FRAME_BYTES-utf8Length(JSON.stringify(skeleton));
+  return Math.max(0,Math.floor(available/4)*3);
+}
+function canvasToBlob(canvas,mime,quality){
+  return new Promise((resolve,reject)=>{
+    try{canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('The browser could not encode this image.')),mime,quality)}
+    catch(err){reject(err)}
+  });
+}
+async function openImageSource(file){
+  if(typeof createImageBitmap==='function'){
+    try{
+      const bitmap=await createImageBitmap(file,{imageOrientation:'from-image'});
+      return{source:bitmap,width:bitmap.width,height:bitmap.height,close:()=>bitmap.close?.()};
+    }catch(err){debugLog('IMAGE','createImageBitmap failed; using image-element fallback',{error:String(err)})}
+  }
+  return new Promise((resolve,reject)=>{
+    const img=new Image(),url=URL.createObjectURL(file);
+    img.onload=()=>{
+      if(!img.naturalWidth||!img.naturalHeight){URL.revokeObjectURL(url);reject(new Error('The image dimensions could not be read.'));return}
+      resolve({source:img,width:img.naturalWidth,height:img.naturalHeight,close:()=>URL.revokeObjectURL(url)});
+    };
+    img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('The selected file could not be opened as an image.'))};
+    img.src=url;
+  });
+}
+async function blobAsImagePayload(blob,width,height,quality,compression){
+  const bytes=new Uint8Array(await blob.arrayBuffer());
+  return{data:bytesToBase64(bytes),mime:blob.type||'image/png',width,height,bytes:bytes.byteLength,quality,compression};
+}
+async function bestWebPAtSize(canvas,maxBytes){
+  const mime='image/webp';
+  // Check a low-quality floor first. If that will not fit, reduce dimensions and retry.
+  let floor=0.55,ceiling=0.99;
+  let bestBlob=await canvasToBlob(canvas,mime,floor);
+  if(bestBlob.type!==mime)return null;
+  if(bestBlob.size>maxBytes)return null;
+  let bestQuality=floor;
+  // Browser WebP encoders produce monotonically increasing sizes in normal use.
+  // Binary search the highest quality that stays inside the available frame budget.
+  for(let i=0;i<7;i++){
+    const q=(floor+ceiling)/2;
+    const candidate=await canvasToBlob(canvas,mime,q);
+    if(candidate.type!==mime)return null;
+    if(candidate.size<=maxBytes){bestBlob=candidate;bestQuality=q;floor=q}
+    else ceiling=q;
+  }
+  return{blob:bestBlob,quality:bestQuality};
+}
+async function compressImageFile(file,maxBytes){
+  if(!file||!Number.isFinite(maxBytes)||maxBytes<1)throw new Error('The WebSocket frame has no room for this image.');
+  const loaded=await openImageSource(file);
+  try{
+    const width=loaded.width,height=loaded.height;
+    if(DIRECT_IMAGE_MIMES.has(file.type)&&file.size>0&&file.size<=maxBytes){
+      const original=await blobAsImagePayload(file,width,height,1,'original');
+      return original;
+    }
+
+    // Bound working-canvas size to avoid excessive memory use on enormous source images.
+    const maxDimension=16384,maxPixels=40_000_000;
+    const initialScale=Math.min(1,maxDimension/width,maxDimension/height,Math.sqrt(maxPixels/(width*height)));
+    const canvas=document.createElement('canvas');
+    const ctx=canvas.getContext('2d',{alpha:true,willReadFrequently:false});
+    if(!ctx)throw new Error('This browser does not provide an image canvas.');
+    let best=null,bestScore=-Infinity,lastSize='';
+
+    // A lossless PNG pass is worthwhile for large PNG artwork/screenshots.
+    if(file.type==='image/png'&&initialScale===1){
+      canvas.width=width;canvas.height=height;ctx.clearRect(0,0,width,height);ctx.drawImage(loaded.source,0,0,width,height);
+      const png=await canvasToBlob(canvas,'image/png');
+      if(png.type==='image/png'&&png.size<=maxBytes)return await blobAsImagePayload(png,width,height,1,'lossless-png');
+    }
+
+    // Search from the source resolution downwards. Each scale finds the highest WebP
+    // quality that fits. A modest reduction can preserve more detail than very low quality.
+    for(let step=0;step<18;step++){
+      const scale=initialScale*Math.pow(0.92,step);
+      const w=Math.max(1,Math.round(width*scale)),h=Math.max(1,Math.round(height*scale));
+      const key=w+'x'+h;
+      if(key===lastSize)continue;
+      lastSize=key;canvas.width=w;canvas.height=h;ctx.clearRect(0,0,w,h);
+      ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(loaded.source,0,0,w,h);
+      const found=await bestWebPAtSize(canvas,maxBytes);
+      if(found){
+        const actualScale=Math.sqrt((w*h)/(width*height));
+        const score=found.quality*Math.sqrt(actualScale);
+        if(score>bestScore){bestScore=score;best={blob:found.blob,width:w,height:h,quality:found.quality,score}}
+        // Prefer near-lossless quality; if it is reached, further downscaling cannot improve fidelity meaningfully.
+        if(found.quality>=0.965)break;
+      }
+      if(w<=320&&h<=320)break;
+    }
+    if(!best)throw new Error('This image could not be reduced enough for the WebSocket frame limit. Try a smaller image.');
+    return await blobAsImagePayload(best.blob,best.width,best.height,best.quality,'webp');
+  }finally{loaded.close()}
+}
+function decodeImageCode(code){
+  if(typeof code!=='string'||code.length<16||code.length>LEGACY_IMAGE_CODE_LIMIT||!/^[A-Za-z0-9+/]+={0,2}$/.test(code)||code.length%4!==0)throw new Error('Invalid legacy image code.');
+  const raw=base64ToBytes(code);if(raw.length<10||raw[0]!==0x85||raw[1]!==1)throw new Error('Unsupported legacy image format or version.');
+  const width=(raw[2]<<8)|raw[3],height=(raw[4]<<8)|raw[5],count=raw[6],bits=raw[7],pixelCount=width*height;
+  if(!width||!height||pixelCount>4800||count<1||count>16||bits<1||bits>4||bits!==Math.max(1,Math.ceil(Math.log2(count))))throw new Error('Invalid legacy image header.');
+  const paletteStart=8,packedStart=paletteStart+count*2,packedLength=Math.ceil(pixelCount*bits/8);
+  if(packedStart+packedLength!==raw.length)throw new Error('Legacy image data is incomplete or damaged.');
+  const palette=[];for(let i=0;i<count;i++){const v=(raw[paletteStart+i*2]<<8)|raw[paletteStart+i*2+1];palette.push([((v>>11)&31)*255/31|0,((v>>5)&63)*255/63|0,(v&31)*255/31|0])}
+  const rgba=new Uint8ClampedArray(pixelCount*4);
+  for(let i=0;i<pixelCount;i++){
+    let index=0;for(let b=0;b<bits;b++){const bit=i*bits+b;index=(index<<1)|((raw[packedStart+(bit>>3)]>>(7-(bit&7)))&1)}
+    if(index>=palette.length)throw new Error('Legacy image contains an invalid palette index.');
+    const c=palette[index],o=i*4;rgba[o]=c[0];rgba[o+1]=c[1];rgba[o+2]=c[2];rgba[o+3]=255;
+  }
+  return{width,height,rgba,colors:count,bits};
+}
+function renderImageInBubble(message,bubble){
+  try{
+    const im=message.image;if(!im||typeof im!=='object')throw new Error('Missing image data.');
+    let src='',detail={};
+    if(im.format==='pcimg-v2'){
+      if(!IMAGE_MIME_ALLOWLIST.has(im.mime))throw new Error('Unsupported image MIME type.');
+      if(typeof im.data!=='string'||im.data.length<8||im.data.length>MAX_WEBSOCKET_FRAME_BYTES||!/^[A-Za-z0-9+/]+={0,2}$/.test(im.data)||im.data.length%4!==0)throw new Error('Image data is invalid or too large.');
+      const raw=atob(im.data);
+      if(raw.length>MAX_WEBSOCKET_FRAME_BYTES||im.bytes!=null&&im.bytes!==raw.length)throw new Error('Image byte count is invalid.');
+      if(im.width!=null&&(!Number.isInteger(im.width)||im.width<1||im.width>100000)||im.height!=null&&(!Number.isInteger(im.height)||im.height<1||im.height>100000))throw new Error('Image dimensions are invalid.');
+      src='data:'+im.mime+';base64,'+im.data;
+      detail={format:im.format,mime:im.mime,bytes:raw.length,width:im.width,height:im.height,quality:im.quality,compression:im.compression};
+    }else if(im.format==='pc850-v1'){
+      const decoded=decodeImageCode(im.code);
+      if(!Number.isInteger(im.width)||!Number.isInteger(im.height)||im.width!==decoded.width||im.height!==decoded.height)throw new Error('Legacy image dimensions do not match the encoded header.');
+      const canvas=document.createElement('canvas');canvas.width=decoded.width;canvas.height=decoded.height;
+      const ctx=canvas.getContext('2d');const imageData=ctx.createImageData(decoded.width,decoded.height);imageData.data.set(decoded.rgba);ctx.putImageData(imageData,0,0);src=canvas.toDataURL('image/png');
+      detail={format:im.format,width:decoded.width,height:decoded.height,codeLength:im.code.length};
+    }else throw new Error('Unsupported image message format.');
+    const img=document.createElement('img');img.className='message-image';img.alt='Image sent by '+(message.name||'another user');img.loading='lazy';img.decoding='async';img.src=src;img.addEventListener('click',()=>openImageViewer(img.src));
+    img.addEventListener('error',()=>{img.remove();const fail=document.createElement('div');fail.className='image-error';fail.textContent='This image could not be displayed.';bubble.appendChild(fail)});
+    bubble.appendChild(img);
+    if(message.text){const caption=document.createElement('div');caption.className='image-caption';caption.textContent=message.text;bubble.appendChild(caption)}
+    debugLog('IMAGE','Image message accepted for display',{messageId:message.id,...detail});return true;
+  }catch(err){const fail=document.createElement('div');fail.className='image-error';fail.textContent='This image could not be displayed.';bubble.appendChild(fail);debugLog('ERROR','Image message rejected or failed to decode',{messageId:message.id,error:String(err)});return false}
+}
+function openImageViewer(src){$('imageViewerImage').src=src;$('imageViewer').classList.add('open')}
+function closeImageViewer(){$('imageViewer').classList.remove('open');$('imageViewerImage').removeAttribute('src')}
+$('imageViewerClose').onclick=closeImageViewer;$('imageViewer').addEventListener('click',e=>{if(e.target===$('imageViewer'))closeImageViewer()});
+function add(d,mine=false,save=true){
+  const sender=d.name||'Anonymous', messages=$('messages'); let group=messages.lastElementChild;
+  const same=group&&group.classList.contains('message-group')&&group.dataset.name===sender&&!group.classList.contains('system')&&!d.poll&&!d.countdown&&!d.temporary;
+  if(!same){group=document.createElement('div');group.className='message-group'+(mine?' mine':'');group.dataset.name=sender;group.dataset.groupId=d.id||'';const n=document.createElement('div');n.className='name';n.textContent=sender+' · '+new Date(d.time||Date.now()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});n.style.color=mine?'var(--mine-text)':colorFor(sender);group.appendChild(n);messages.appendChild(group)} else if(mine) group.classList.add('mine');
+  if(d.poll){renderPoll(d,group);if(save)saveHistory(d);messages.scrollTop=messages.scrollHeight;return}
+  if(d.countdown){renderCountdown(d,group);if(save)saveHistory(d);messages.scrollTop=messages.scrollHeight;return}
+  const line=document.createElement('div');line.className='message-line';
+  const b=document.createElement('div');b.className='bubble single'+(d.image?' image-bubble':'');b.dataset.messageId=d.id||crypto.randomUUID();b.dataset.rawText=d.text||'';b.dataset.senderId=d.clientId||'';b.dataset.time=d.time||Date.now();const imageAccepted=d.image?renderImageInBubble(d,b):true;if(!d.image)b.textContent=d.text||'';
+  if(d.replyText){const q=document.createElement('div');q.style.cssText='font-size:11px;opacity:.7;border-left:3px solid currentColor;padding-left:6px;margin-bottom:5px';q.textContent='↳ '+d.replyName+': '+d.replyText;b.prepend(q)}
+  if(d.expiresAt){const ex=document.createElement('span');ex.style.cssText='display:block;font-size:9px;opacity:.65;margin-top:4px';ex.textContent='⏳ temporary';b.appendChild(ex);scheduleExpiry(d)}
+  group.querySelectorAll('.bubble').forEach(x=>x.classList.remove('last','single'));const bs=group.querySelectorAll('.bubble');if(bs.length)b.classList.add('last');if(bs.length===1)b.classList.add('first');
+  const actions=document.createElement('div');actions.className='message-actions';
+  const rep=document.createElement('button');rep.textContent='↩';rep.title='Reply';rep.setAttribute('aria-label','Reply');rep.onclick=()=>setReply(d);actions.appendChild(rep);
+  const react=document.createElement('button');react.textContent='☺';react.title='React';react.setAttribute('aria-label','React');react.className='react-btn';
+  const picker=document.createElement('div');picker.className='reaction-picker';picker.setAttribute('role','menu');picker.dataset.messageId=d.id||'';['👍','❤️','😂','🔥','😮','😢','🎉'].forEach(r=>{const x=document.createElement('button');x.type='button';x.textContent=r;x.title=r;x.setAttribute('aria-label','React '+r);x.addEventListener('pointerdown',e=>e.stopPropagation());x.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();debugLog('INFO','Reaction selected',{messageId:d.id,reaction:r,from:clientId});if(ws&&ws.readyState===WebSocket.OPEN){send({type:'reaction',id:d.id,reaction:r,name,clientId});renderReaction(b,r,name,true)}else{debugLog('ERROR','Reaction not sent: socket is not OPEN',{messageId:d.id,reaction:r,readyState:ws?ws.readyState:null})}closeReactionPicker()});picker.appendChild(x)});document.body.appendChild(picker);
+  react.onclick=e=>{e.preventDefault();e.stopPropagation();if(picker.classList.contains('open')){closeReactionPicker();return}document.querySelectorAll('.reaction-picker.open').forEach(x=>x.classList.remove('open'));const rect=react.getBoundingClientRect();picker.style.left=Math.max(8,Math.min(window.innerWidth-picker.offsetWidth-8,rect.right-picker.offsetWidth))+'px';picker.style.top=Math.max(8,rect.top-picker.offsetHeight-8)+'px';picker.classList.add('open')};actions.appendChild(react);
+  const more=document.createElement('button');more.textContent='⋯';more.title='More';more.setAttribute('aria-label','More');
+  const menu=document.createElement('div');menu.className='more-menu';[['Copy','copy'],['Technical details','details']].forEach(([label,act])=>{const x=document.createElement('button');x.textContent=label;x.onclick=async()=>{if(act==='copy'){try{await navigator.clipboard.writeText(d.text||'')}catch{}debugLog('DOM','Message copied',{messageId:d.id})}else{debugLog('INFO','Message technical details',{message:debugSafeEvent(d),element:{sender,bubble:b.outerHTML.slice(0,500)}});alert('Message ID: '+d.id+'\nSender: '+(d.name||'Anonymous')+'\nClient: '+(d.clientId||'unknown')+'\nTime: '+new Date(d.time||Date.now()).toISOString())}menu.classList.remove('open')};menu.appendChild(x)});more.onclick=e=>{e.stopPropagation();document.querySelectorAll('.more-menu.open').forEach(x=>x.classList.remove('open'));menu.classList.toggle('open')};actions.appendChild(more);actions.appendChild(menu);
+  line.appendChild(b);line.appendChild(actions);group.appendChild(line);
+  if(mine){const del=document.createElement('div');del.className='delivery pending';del.dataset.messageId=d.id||'';del.textContent='Sent';group.appendChild(del);pendingDelivery.set(d.id,{time:Date.now(),el:del})}
+  if(d.clientId===clientId&&seenMessages.has(d.id)) markSeen(d.id); observeForSeen(b,d);
+  if(save)saveHistory(d); messages.scrollTop=messages.scrollHeight;return imageAccepted;
+}
+function findBubble(id){return document.querySelector('[data-message-id="'+CSS.escape(id)+'"]')}
+function observeForSeen(b,d){if(d.clientId===clientId||!d.id||seenMessages.has(d.id))return;const obs=new IntersectionObserver(entries=>{if(entries.some(x=>x.isIntersecting)){seenMessages.add(d.id);send({type:'seen',messageId:d.id,to:d.clientId,from:clientId,time:Date.now()});debugLog('INFO','Message became visible; sent seen acknowledgement',{messageId:d.id});obs.disconnect()}},{root:$('messages'),threshold:.6});obs.observe(b)}
+function markSeen(id){const el=document.querySelector('.delivery[data-message-id="'+CSS.escape(id)+'"]');if(el){el.textContent='Seen';el.classList.remove('pending');el.classList.add('seen-state')}}
+function scheduleExpiry(d){const ms=Math.max(0,(d.expiresAt||0)-Date.now());setTimeout(()=>{document.querySelectorAll('[data-message-id="'+CSS.escape(d.id)+'"]').forEach(x=>{const g=x.closest('.message-group');if(g)g.remove()});debugLog('INFO','Temporary message expired',{messageId:d.id})},ms)}
+function renderReaction(b,r,who,animate=false){let row=b.querySelector('.reaction-row');if(!row){row=document.createElement('div');row.className='reaction-row';b.appendChild(row)}const x=document.createElement('span');x.className='reaction'+(animate?' pop':'');x.textContent=r;x.title=who||'';row.appendChild(x);if(animate)setTimeout(()=>x.classList.remove('pop'),500)}
+function renderPoll(d,group){const card=document.createElement('div');card.className='poll-card';const q=document.createElement('div');q.className='poll-question';q.textContent=d.question;card.appendChild(q);const votes=d.votes||{};d.options.forEach((opt,i)=>{const row=document.createElement('div');row.className='poll-option';const btn=document.createElement('button');const bar=document.createElement('span');bar.className='poll-bar';const label=document.createElement('span');label.textContent=opt;btn.append(bar,label);btn.onclick=()=>{send({type:'pollVote',id:d.id,index:i,clientId,name});applyPollVote(d.id,i,clientId);};row.appendChild(btn);card.appendChild(row)});const meta=document.createElement('div');meta.className='poll-meta';meta.dataset.pollMeta=d.id;meta.textContent='0 votes';card.appendChild(meta);group.appendChild(card);pollState.set(d.id,{data:d,card});updatePollUI(d.id)}
+function applyPollVote(id,index,voter){const p=pollState.get(id);if(!p)return;p.data.voters=p.data.voters||{};p.data.voters[voter]=index;updatePollUI(id)}
+function updatePollUI(id){const p=pollState.get(id);if(!p)return;const counts=p.data.options.map(()=>0);Object.values(p.data.voters||{}).forEach(i=>{if(counts[i]!==undefined)counts[i]++});const total=counts.reduce((a,b)=>a+b,0);p.card.querySelectorAll('.poll-option').forEach((row,i)=>{row.querySelector('.poll-bar').style.width=(total?counts[i]/total*100:0)+'%';row.querySelector('button').title=counts[i]+' vote'+(counts[i]===1?'':'s')});const meta=p.card.querySelector('[data-poll-meta]');if(meta)meta.textContent=total+' vote'+(total===1?'':'s')}
+function renderCountdown(d,group){const card=document.createElement('div');card.className='countdown-card';const label=document.createElement('div');label.className='countdown-label';label.textContent=d.label||'Countdown';const time=document.createElement('div');time.className='countdown-time';card.append(label,time);group.appendChild(card);const tick=()=>{const left=Math.max(0,d.endAt-Date.now());const s=Math.floor(left/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60),sec=s%60;time.textContent=(h?String(h).padStart(2,'0')+':':'')+String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');if(left<=0){time.textContent='00:00';clearInterval(countdownTimers.get(d.id));}};tick();countdownTimers.set(d.id,setInterval(tick,250))}
+
+function findBubble(id){return document.querySelector('[data-message-id="'+CSS.escape(id)+'"]')}
+function setReply(d){replyTo={id:d.id,name:d.name,text:d.text};$('replyText').textContent='Replying to '+d.name+': '+d.text.slice(0,100);$('replyPreview').classList.add('visible');$('text').focus()}
+
+function bridgeLegacy(d){
+  if(!d||d.type!=='msg'||!LEGACY_BRIDGE||d.image)return;
+  try{
+    fetch(LEGACY_BRIDGE,{method:'POST',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify(d),cache:'no-store'}).catch(()=>{});
+  }catch{}
+}
+
+function debugSafeEvent(d){if(!d||!d.image||typeof d.image!=='object')return d;const safe={...d,image:{...d.image}};for(const key of ['code','data'])if(typeof safe.image[key]==='string')safe.image[key]='[image data hidden · '+safe.image[key].length+' characters]';return safe}
+function debugSafeFrame(raw){try{return debugSafeEvent(JSON.parse(raw))}catch{return '[non-JSON frame · '+String(raw||'').length+' characters]'}}
+function send(d){network.events++;const payload=JSON.stringify(d);debugLog('OUT','WebSocket send',{readyState:ws?ws.readyState:null,type:d?.type,payloadLength:payload.length,payload:debugSafeEvent(d)});if(ws&&ws.readyState===WebSocket.OPEN){try{ws.send(payload);debugLog('WS','WebSocket frame sent',{type:d?.type,payloadLength:payload.length});bridgeLegacy(d);return true}catch(err){debugLog('ERROR','WebSocket send failed',{type:d?.type,error:String(err)});return false}}debugLog('ERROR','WebSocket send skipped: socket is not OPEN',{readyState:ws?ws.readyState:null,type:d?.type});return false}
+function renderMembers(){const el=$('memberList');el.innerHTML='';const list=[...members.values()].sort((a,b)=>(a.name||'Anonymous').localeCompare(b.name||'Anonymous'));for(const m of list){const chip=document.createElement('div');chip.className='member-chip'+(m.id===clientId?' me':'');const dot=document.createElement('span');dot.className='member-dot presence-dot';dot.style.background=m.state==='idle'?'#e3b341':(m.id===clientId?'var(--accent)':colorFor(m.name||'Anonymous'));const n=document.createElement('span');n.className='member-name';n.textContent=m.name||'Anonymous';n.style.color=m.id===clientId?'var(--text)':colorFor(m.name||'Anonymous');chip.title=(m.state==='idle'?'Idle':'Online')+' · click for profile';chip.onclick=()=>showProfile(m,chip);chip.append(dot,n);el.appendChild(chip)}$('people').textContent=list.length+' online';renderNetworkPeers()}
+function updateMember(d){if(!d.clientId||d.clientId===clientId){if(d?.clientId===clientId)debugLog('STATE','Ignored own presence echo',d);return}members.set(d.clientId,{id:d.clientId,name:d.name||'Anonymous',avatar:d.avatar||'😀',state:d.state||'online',lastSeen:Date.now(),joined:members.get(d.clientId)?.joined||Date.now()});debugLog('STATE','Member presence updated',{clientId:d.clientId,name:d.name,state:d.state});renderMembers();recordPopulation()}
+function removeMember(id){if(members.delete(id)){debugLog('STATE','Member removed',{clientId:id});renderMembers()}}
+function memberHeartbeat(){network.lastHeartbeat=Date.now();idleState=(Date.now()-lastActivity>60000)?'idle':'online';send({type:'presence',name,avatar,clientId,state:idleState});members.set(clientId,{id:clientId,name:name||'Anonymous',avatar,state:idleState,lastSeen:Date.now(),joined:members.get(clientId)?.joined||Date.now()});for(const [id,m] of members){if(id!==clientId&&Date.now()-m.lastSeen>10000)members.delete(id)}renderMembers();recordPopulation()}
+function showProfile(m,anchor){const p=$('profilePop');const rect=anchor.getBoundingClientRect();const age=Math.max(0,Math.floor((Date.now()-(m.joined||Date.now()))/60000));const userEvents=diag.timeline.filter(x=>x.data&&x.data.clientId===m.id).length;const userLatency=diag.latencyByClient.get(m.id);const userMsgs=[...diag.messageAcks.values()].filter(x=>x.from===m.name).length;p.innerHTML='<div class="profile-name">'+escapeHtml(m.avatar||'😀')+' '+escapeHtml(m.name||'Anonymous')+'</div><div class="profile-state"><span class="state-dot '+(m.state==='idle'?'idle':'')+'"></span><span>'+(m.state==='idle'?'Idle':'Online')+'</span></div><div class="profile-meta">Client: '+escapeHtml((m.id||'').slice(0,12))+'…<br>Seen '+Math.max(0,Math.floor((Date.now()-(m.lastSeen||Date.now()))/1000))+'s ago<br>Present for '+age+'m<br>Messages seen: '+userMsgs+'<br>Diagnostic events: '+userEvents+(userLatency?' <br>Last ping: '+userLatency+'ms':'')+'</div>';p.style.left=Math.min(window.innerWidth-225,Math.max(8,rect.left))+'px';p.style.top=Math.min(window.innerHeight-150,rect.bottom+6)+'px';p.classList.add('open')}
+function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderNetworkPeers(){const el=$('netPeers');if(!el)return;el.innerHTML=[...members.values()].map(m=>'<span class="net-peer"><i class="net-peer-dot" style="background:'+(m.state==='idle'?'#e3b341':'#35b86b')+'"></i>'+escapeHtml(m.name||'Anonymous')+'</span>').join('')||'<span class="net-label">Only you</span>'}
+
+function showTyping(who,id){const key=id||who;typingUsers.set(key,{name:who,last:Date.now()});renderTyping()}
+function renderTyping(){for(const [k,v] of typingUsers)if(Date.now()-v.last>2200)typingUsers.delete(k);const names=[...typingUsers.values()].map(v=>v.name);const t=$('typing');if(!names.length){t.classList.remove('visible');return}t.classList.add('visible');t.innerHTML='<span class=typing-names>'+names.slice(0,3).join(', ')+(names.length>3?' and '+(names.length-3)+' more':'')+' '+(names.length===1?'is':'are')+' typing…</span>'}
+function connect(){
+  debugLog('STATE','Connecting to WebSocket',{url:ROUTER+CHANNEL,previousReadyState:ws?ws.readyState:null});
+  try{ws=new WebSocket(ROUTER+CHANNEL);debugLog('WS','WebSocket object created',{url:ROUTER+CHANNEL,readyState:ws.readyState});
+    ws.onopen=()=>{debugLog('WS','WebSocket OPEN',{url:ROUTER+CHANNEL,readyState:ws.readyState});$('status').textContent='Connected';$('status').style.color='#16834a';addFriendlyEvent('Connected to the chat relay');send({type:'hello',name,avatar,clientId,state:idleState});memberHeartbeat();clearInterval(memberTimer);memberTimer=setInterval(memberHeartbeat,3000);system('You joined the public chat.')}
+    ws.onmessage=e=>{network.events++;network.receivedBytes=(network.receivedBytes||0)+String(e.data||'').length;debugLog('IN','WebSocket frame received',debugSafeFrame(e.data));try{const d=JSON.parse(e.data);if(!d){debugLog('ERROR','Received empty/false JSON payload');return;}debugLog('WS','Parsed incoming event',debugSafeEvent(d));
+      if(d.type==='hello'||d.type==='presence'){updateMember(d);return}
+      if(d.type==='msg'){network.msgs++;if(d.id&&!diag.messageAcks.has(d.id))diag.messageAcks.set(d.id,{id:d.id,from:d.name||'Anonymous',delivered:[],seen:[]});updateMember(d);if(d.image){debugLog('IMAGE','Incoming image envelope received',{messageId:d.id,from:d.clientId,format:d.image.format,codeLength:typeof d.image.code==='string'?d.image.code.length:null});}const accepted=add(d,false);if(d.clientId&&d.clientId!==clientId&&d.id&&accepted!==false){send({type:'delivered',messageId:d.id,to:d.clientId,from:clientId});}else if(d.image&&accepted===false){debugLog('ERROR','Image delivery acknowledgement withheld because the received image failed validation',{messageId:d.id,from:d.clientId});}}
+      if(d.type==='typing'){updateMember(d);showTyping(d.name||'Someone',d.clientId)}
+      if(d.type==='delivered'&&d.to===clientId&&d.from&&d.from!==clientId&&d.messageId){diag.delivered++;diag.sentAt.has(d.messageId)&&diag.latencyByClient.set(d.from,Date.now()-diag.sentAt.get(d.messageId));const ack=diag.messageAcks.get(d.messageId);if(ack&&!ack.delivered.includes(d.from))ack.delivered.push(d.from);const el=document.querySelector('.delivery[data-message-id="'+CSS.escape(d.messageId)+'"]');const p=pendingDelivery.get(d.messageId);if(el&&p){el.textContent='Delivered';el.classList.remove('pending');const rtt=Date.now()-p.time;network.rtt.push(rtt);if(network.rtt.length>20)network.rtt.shift();pendingDelivery.delete(d.messageId);debugLog('INFO','Delivery confirmed by another client',{messageId:d.messageId,from:d.from,rttMs:rtt})}}
+      if(d.type==='seen'&&d.to===clientId&&d.from!==clientId&&d.messageId){diag.seen++;const sack=diag.messageAcks.get(d.messageId);if(sack&&!sack.seen.includes(d.from))sack.seen.push(d.from);markSeen(d.messageId);debugLog('INFO','Message seen acknowledgement received',{messageId:d.messageId,from:d.from})}
+      if(d.type==='reaction'){const b=findBubble(d.id);if(b)renderReaction(b,d.reaction,d.name||'Someone',true)}
+      if(d.type==='poll'){d.voters=d.voters||{};add(d,false)}
+      if(d.type==='pollVote'){applyPollVote(d.id,d.index,d.clientId||d.name);}
+      if(d.type==='countdown'){add(d,false)}
+      if(d.type==='cursor'&&boardOpen&&d.clientId!==clientId){renderSharedCursor(d)}
+      if(d.type==='diagPing'&&d.to===clientId){send({type:'diagPong',to:d.from,from:clientId,sentAt:d.sentAt,clientId,name});}
+      if(d.type==='diagPacket'&&d.clientId!==clientId){send({type:'diagPacketAck',to:d.from,id:d.id,size:String(d.payload||'').length,from:clientId});debugLog('INFO','Diagnostic packet received by another client',{from:d.from,id:d.id,size:String(d.payload||'').length})}
+      if(d.type==='diagPacketAck'&&d.to===clientId){debugLog('INFO','Diagnostic packet acknowledged',{from:d.from,id:d.id,size:d.size});}
+      if(d.type==='diagPong'&&d.to===clientId&&d.sentAt){const ms=Date.now()-d.sentAt;diag.latencyByClient.set(d.from,ms);network.rtt.push(ms);if(network.rtt.length>50)network.rtt.shift();debugLog('INFO','Diagnostic ping response',{from:d.from,latencyMs:ms});}
+      if(d.type==='boardStroke'&&boardOpen&&d.clientId!==clientId){drawRemoteStroke(d)}
+      if(d.type==='boardClear'&&boardOpen&&d.clientId!==clientId){clearBoardLocal()}
+    }catch(err){debugLog('ERROR','Failed to parse/process WebSocket message',{error:String(err),raw:debugSafeFrame(e.data)})}};
+    ws.onclose=event=>{network.reconnects++;debugLog('WS','WebSocket CLOSED',{code:event.code,reason:event.reason,wasClean:event.wasClean});clearInterval(memberTimer);members.clear();renderMembers();$('status').textContent='Disconnected — reconnecting…';$('status').style.color='#b33';addFriendlyEvent('Connection lost — reconnecting');setTimeout(connect,1500)};
+    ws.onerror=event=>debugLog('ERROR','WebSocket error event',{type:event.type,readyState:ws?ws.readyState:null});
+  }catch(err){debugLog('ERROR','WebSocket construction failed',String(err));setTimeout(connect,1500)}
+}
+$('name').onchange=()=>{debugLog('DOM','Username changed',{from:name,to:$('name').value});name=$('name').value.trim()||'Anonymous';localStorage.setItem('simplechat-name',name);send({type:'presence',name,avatar,clientId,state:idleState})};
+$('text').oninput=()=>{send({type:'typing',name,avatar,clientId,state:idleState});showTyping(name,clientId)};setInterval(renderTyping,1000);
+const themeSelect=$('theme'), modeBtn=$('mode'), about=$('about');
+function applyTheme(theme){document.body.classList.remove('theme-blue','theme-green','theme-purple','theme-red','theme-orange','theme-pink','theme-cyan','theme-yellow');if(theme!=='default')document.body.classList.add('theme-'+theme);localStorage.setItem('simplechat-theme',theme)}
+function applyMode(dark){document.body.classList.toggle('dark',dark);modeBtn.textContent=dark?'☀ Light':'☾ Dark';localStorage.setItem('simplechat-dark',dark?'1':'0')}
+themeSelect.value=localStorage.getItem('simplechat-theme')||'default';applyTheme(themeSelect.value);applyMode(localStorage.getItem('simplechat-dark')===null?true:localStorage.getItem('simplechat-dark')==='1');
+themeSelect.onchange=()=>{applyTheme(themeSelect.value);debugLog('DOM','Theme changed',{theme:themeSelect.value})};modeBtn.onclick=()=>applyMode(!document.body.classList.contains('dark'));$('aboutBtn').onclick=()=>about.style.display='flex';$('aboutClose').onclick=()=>about.style.display='none';about.onclick=e=>{if(e.target===about)about.style.display='none'};
+$('settingsBtn').onclick=function(e){e.stopPropagation();$('settingsPanel').classList.toggle('open')};document.addEventListener('click',function(e){if(!$('settingsPanel').contains(e.target)&&e.target!==$('settingsBtn'))$('settingsPanel').classList.remove('open')});
+$('cancelReply').onclick=()=>{replyTo=null;$('replyPreview').classList.remove('visible')};
+function submitMessage(extra={}){const t=$('text').value.trim();if(!t)return;if(!name){name='Anonymous';$('name').value=name}const tempMs=Number($('text').dataset.temp||0);if(tempMs&&!extra.expiresAt)extra={...extra,expiresAt:Date.now()+tempMs,temporary:true};$('text').dataset.temp='';const d={type:'msg',id:crypto.randomUUID(),name,avatar,text:t,time:Date.now(),clientId,...extra};if(replyTo){d.replyId=replyTo.id;d.replyName=replyTo.name;d.replyText=replyTo.text}diag.sentAt.set(d.id,Date.now());diag.deliveryTotal++;send(d);add(d,true);$('text').value='';replyTo=null;$('replyPreview').classList.remove('visible');$('text').focus()}
+function setImagePreview(file){
+  if(imageSendBusy){debugLog('IMAGE','Ignored new attachment while an image is being sent');return}
+  if(!file||!file.type||!file.type.startsWith('image/')){system('Please choose a supported image file.');return}
+  clearPendingImage();pendingImageFile=file;pendingImageUrl=URL.createObjectURL(file);$('imagePreviewThumb').src=pendingImageUrl;$('imagePreviewName').textContent=file.name||'Pasted image';$('imagePreviewStatus').textContent='Ready to send · maximum practical quality';$('imagePreviewPanel').classList.add('visible');$('imageSendBtn').disabled=false;$('imageSendBtn').textContent='Send image';debugLog('IMAGE','Image selected',{name:file.name||'image',type:file.type,size:file.size});
+}
+function clearPendingImage(force=false){if(imageSendBusy&&!force)return;pendingImageFile=null;if(pendingImageUrl){URL.revokeObjectURL(pendingImageUrl);pendingImageUrl=''}$('imagePreviewThumb').removeAttribute('src');$('imagePreviewPanel').classList.remove('visible');$('imagePreviewStatus').textContent='Ready to send';$('imageSendBtn').disabled=false;$('imageSendBtn').textContent='Send image';$('imageFileInput').value=''}
+async function sendSelectedImage(){
+  if(!pendingImageFile||imageSendBusy)return;
+  if(!ws||ws.readyState!==WebSocket.OPEN){$('imagePreviewStatus').textContent='Not connected. Your image is still selected; try again when connected.';debugLog('ERROR','Image send blocked because WebSocket is not open',{readyState:ws?ws.readyState:null});return}
+  imageSendBusy=true;$('imageSendBtn').disabled=true;$('imageCancelBtn').disabled=true;$('imageBtn').disabled=true;$('imageSendBtn').textContent='Working…';$('imagePreviewStatus').innerHTML='<span class="image-progress">Optimising image quality…</span>';
+  const file=pendingImageFile;
+  try{
+    const message={type:'msg',id:crypto.randomUUID(),name:name||'Anonymous',avatar,text:$('text').value.trim(),time:Date.now(),clientId};
+    const budget=imagePayloadBudget(message);
+    if(budget<1024)throw new Error('There is not enough room in the WebSocket frame for an image.');
+    const encoded=await compressImageFile(file,budget);
+    const image={format:'pcimg-v2',mime:encoded.mime,data:encoded.data,width:encoded.width,height:encoded.height,bytes:encoded.bytes,quality:encoded.quality,compression:encoded.compression};
+    message.image=image;
+    const frame=JSON.stringify(message),frameBytes=utf8Length(frame);
+    if(frameBytes>MAX_IMAGE_FRAME_BYTES)throw new Error('The image is still too large for the WebSocket frame. Try a smaller source image.');
+    // Sanity-check that the produced image payload is valid Base64 and round-trips to its byte length.
+    const check=atob(image.data);
+    if(check.length!==image.bytes)throw new Error('The compressed image failed its local integrity check.');
+    $('imagePreviewStatus').innerHTML='<span class="image-progress">Sending photo…</span>';$('imageSendBtn').textContent='Sending…';
+    debugLog('IMAGE','Image compressed successfully',{messageId:message.id,width:encoded.width,height:encoded.height,mime:encoded.mime,bytes:encoded.bytes,quality:encoded.quality,compression:encoded.compression,frameBytes});
+    if(!send(message))throw new Error('The WebSocket connection rejected the send. Your image is still selected so you can retry.');
+    diag.sentAt.set(message.id,Date.now());diag.deliveryTotal++;add(message,true);$('text').value='';replyTo=null;$('replyPreview').classList.remove('visible');
+    debugLog('IMAGE','High-quality image envelope sent through the existing WebSocket message transport',{messageId:message.id,frameType:'msg',frameBytes,frameLimit:MAX_IMAGE_FRAME_BYTES});
+    clearPendingImage(true);
+  }catch(err){$('imagePreviewStatus').textContent=(err&&err.message?err.message:'Image compression or sending failed.')+' Your image is still selected; you can retry or cancel.';debugLog('ERROR','Image send failed',{error:String(err),fileName:file?.name||''});$('imageSendBtn').disabled=false;$('imageSendBtn').textContent='Retry send'}
+  finally{imageSendBusy=false;$('imageCancelBtn').disabled=false;$('imageBtn').disabled=false;if(pendingImageFile)$('imageSendBtn').disabled=false}
+}
+$('imageBtn').onclick=()=>$('imageFileInput').click();$('imageFileInput').onchange=e=>{const f=e.target.files&&e.target.files[0];if(f)setImagePreview(f)};$('imageCancelBtn').onclick=clearPendingImage;$('imageSendBtn').onclick=sendSelectedImage;
+
+// Camera capture uses the browser's live camera preview. The captured photo is
+// converted to a File and then follows the exact same quality/size/WebSocket path.
+let cameraStream=null,cameraFacing='environment',cameraRequestToken=0,cameraShotUrl='',cameraCapturedFile=null;
+const cameraVideo=$('cameraVideo');
+function stopCameraStream(){if(cameraStream){for(const track of cameraStream.getTracks())track.stop();cameraStream=null}if(cameraVideo)cameraVideo.srcObject=null}
+function clearCameraShot(){cameraCapturedFile=null;if(cameraShotUrl){URL.revokeObjectURL(cameraShotUrl);cameraShotUrl=''}$('cameraShotPreview').removeAttribute('src')}
+function closeCamera(){cameraRequestToken++;stopCameraStream();clearCameraShot();$('cameraModal').classList.remove('open');$('cameraModal').setAttribute('aria-hidden','true');$('cameraLiveStage').hidden=false;$('cameraShotStage').hidden=true;$('cameraCapture').hidden=false;$('cameraSwitch').hidden=false;$('cameraRetake').hidden=true;$('cameraUse').hidden=true;$('cameraStatus').textContent='Camera closed';$('cameraVideo').classList.remove('camera-selfie')}
+async function startCamera(){
+  const token=++cameraRequestToken;stopCameraStream();$('cameraStatus').textContent='Requesting camera access…';$('cameraCapture').disabled=true;$('cameraSwitch').disabled=true;
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:cameraFacing},width:{ideal:1920},height:{ideal:1080},frameRate:{ideal:30,max:30}}});
+    if(token!==cameraRequestToken){stream.getTracks().forEach(t=>t.stop());return}
+    cameraStream=stream;cameraVideo.srcObject=stream;cameraVideo.classList.toggle('camera-selfie',cameraFacing==='user');
+    await cameraVideo.play().catch(()=>{});
+    if(token!==cameraRequestToken)return;
+    const track=stream.getVideoTracks()[0],settings=track&&track.getSettings?track.getSettings():{};
+    $('cameraStatus').textContent='Camera ready'+(settings.width&&settings.height?' · '+settings.width+' × '+settings.height:'')+'.';$('cameraCapture').disabled=false;$('cameraSwitch').disabled=false;
+  }catch(err){
+    if(token!==cameraRequestToken)return;
+    const message=err&&err.name==='NotAllowedError'?'Camera permission was denied. Allow camera access in your browser and try again.':err&&err.name==='NotFoundError'?'No camera was found on this device.':'The camera could not be started. Check that it is not being used by another app.';
+    $('cameraStatus').textContent=message;$('cameraCapture').disabled=true;$('cameraSwitch').disabled=false;debugLog('ERROR','Camera could not be started',{name:err&&err.name||'',error:String(err)});
+  }
+}
+async function openCamera(){
+  if(imageSendBusy)return;
+  $('cameraModal').classList.add('open');$('cameraModal').setAttribute('aria-hidden','false');$('cameraLiveStage').hidden=false;$('cameraShotStage').hidden=true;$('cameraCapture').hidden=false;$('cameraSwitch').hidden=false;$('cameraRetake').hidden=true;$('cameraUse').hidden=true;clearCameraShot();
+  if(!navigator.mediaDevices||typeof navigator.mediaDevices.getUserMedia!=='function'){
+    $('cameraStatus').textContent='Live camera preview is not available here. Opening the device camera picker instead.';
+    $('cameraFallbackInput').click();closeCamera();return;
+  }
+  await startCamera();
+}
+$('cameraBtn').onclick=openCamera;
+$('cameraClose').onclick=closeCamera;
+$('cameraModal').addEventListener('click',e=>{if(e.target===$('cameraModal'))closeCamera()});
+$('cameraSwitch').onclick=()=>{cameraFacing=cameraFacing==='environment'?'user':'environment';startCamera()};
+$('cameraCapture').onclick=async()=>{
+  if(!cameraStream||!cameraVideo.videoWidth||!cameraVideo.videoHeight)return;
+  $('cameraCapture').disabled=true;$('cameraStatus').textContent='Capturing photo…';
+  try{
+    const canvas=document.createElement('canvas'),w=cameraVideo.videoWidth,h=cameraVideo.videoHeight;canvas.width=w;canvas.height=h;
+    const ctx=canvas.getContext('2d');if(!ctx)throw new Error('Canvas is unavailable in this browser.');
+    // The preview is mirrored for the front-facing camera, so mirror its saved selfie too.
+    if(cameraFacing==='user'){ctx.translate(w,0);ctx.scale(-1,1)}ctx.drawImage(cameraVideo,0,0,w,h);
+    const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',.96));
+    if(!blob)throw new Error('The camera photo could not be created.');
+    cameraCapturedFile=new File([blob],'PartyChat-photo-'+Date.now()+'.jpg',{type:blob.type||'image/jpeg',lastModified:Date.now()});
+    cameraShotUrl=URL.createObjectURL(cameraCapturedFile);$('cameraShotPreview').src=cameraShotUrl;
+    stopCameraStream();$('cameraLiveStage').hidden=true;$('cameraShotStage').hidden=false;$('cameraCapture').hidden=true;$('cameraSwitch').hidden=true;$('cameraRetake').hidden=false;$('cameraUse').hidden=false;$('cameraStatus').textContent='Photo captured · '+w+' × '+h+' pixels. Retake it or use this photo.';debugLog('IMAGE','Photo captured from in-chat camera',{width:w,height:h,bytes:blob.size,mime:blob.type||'image/jpeg'});
+  }catch(err){$('cameraStatus').textContent=err&&err.message?err.message:'Could not capture a photo.';$('cameraCapture').disabled=false;debugLog('ERROR','Camera capture failed',{error:String(err)})}
+};
+$('cameraRetake').onclick=()=>{clearCameraShot();$('cameraLiveStage').hidden=false;$('cameraShotStage').hidden=true;$('cameraCapture').hidden=false;$('cameraSwitch').hidden=false;$('cameraRetake').hidden=true;$('cameraUse').hidden=true;startCamera()};
+$('cameraUse').onclick=()=>{if(!cameraCapturedFile)return;const file=cameraCapturedFile;closeCamera();setImagePreview(file);$('imagePreviewName').textContent='Camera photo';$('imagePreviewStatus').textContent='Ready to send · maximum practical quality'};
+$('cameraFallbackInput').onchange=e=>{const f=e.target.files&&e.target.files[0];if(f)setImagePreview(f);e.target.value=''};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('cameraModal').classList.contains('open'))closeCamera()});
+
+$('messages').addEventListener('dragenter',e=>{if([...e.dataTransfer.types].includes('Files')){e.preventDefault();$('messages').classList.add('drop-target')}});$('messages').addEventListener('dragover',e=>{if([...e.dataTransfer.types].includes('Files'))e.preventDefault()});$('messages').addEventListener('dragleave',e=>{if(!e.relatedTarget||!$('messages').contains(e.relatedTarget))$('messages').classList.remove('drop-target')});$('messages').addEventListener('drop',e=>{e.preventDefault();$('messages').classList.remove('drop-target');const f=[...(e.dataTransfer.files||[])].find(x=>x.type&&x.type.startsWith('image/'));if(f)setImagePreview(f)});
+document.addEventListener('paste',e=>{const items=[...(e.clipboardData?.items||[])];const item=items.find(x=>x.type&&x.type.startsWith('image/'));if(item){const file=item.getAsFile();if(file){e.preventDefault();setImagePreview(file)}}});
+$('form').onsubmit=e=>{e.preventDefault();submitMessage()};
+$('toolsBtn').onclick=e=>{e.stopPropagation();$('toolsPanel').classList.toggle('open')};document.addEventListener('click',e=>{if(!$('toolsPanel').contains(e.target)&&e.target!==$('toolsBtn'))$('toolsPanel').classList.remove('open');if(!$('profilePop').contains(e.target)&&!e.target.closest('.member-chip'))$('profilePop').classList.remove('open');if(!e.target.closest('.message-actions'))document.querySelectorAll('.reaction-picker.open,.more-menu.open').forEach(x=>x.classList.remove('open'))});
+$('tempBtn').onclick=()=>{const ms=Number($('tempDuration').value);if($('text').value.trim())submitMessage({expiresAt:Date.now()+ms,temporary:true});else{$('text').placeholder='Type a temporary message, then Send';$('text').dataset.temp=String(ms);$('toolsPanel').classList.remove('open');$('text').focus()}};
+$('pollBtn').onclick=()=>{const q=prompt('Poll question:');if(!q)return;const raw=prompt('Options separated by |','Yes|No');if(!raw)return;const options=raw.split('|').map(x=>x.trim()).filter(Boolean).slice(0,8);if(options.length<2)return;const d={type:'poll',id:crypto.randomUUID(),question:q,options,voters:{},name,avatar,time:Date.now(),clientId};send(d);add(d,true);$('toolsPanel').classList.remove('open')};
+$('countBtn').onclick=()=>{const sec=Number(prompt('Countdown duration in seconds:','60'));if(!sec||sec<1)return;const label=prompt('Countdown label:','Countdown');const d={type:'countdown',id:crypto.randomUUID(),label:label||'Countdown',endAt:Date.now()+sec*1000,name,avatar,time:Date.now(),clientId};send(d);add(d,true);$('toolsPanel').classList.remove('open')};
+
+['mousemove','keydown','click','touchstart'].forEach(ev=>document.addEventListener(ev,()=>{lastActivity=Date.now();if(idleState==='idle'){idleState='online';send({type:'presence',name,avatar,clientId,state:'online'})}},{passive:true}));
+function resizeBoard(){const c=$('boardCanvas'),r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;c.width=Math.floor(r.width*d);c.height=Math.floor(r.height*d);boardCtx=c.getContext('2d');boardCtx.scale(d,d);boardCtx.lineCap='round';boardCtx.lineJoin='round'}
+function boardPoint(e){const r=$('boardCanvas').getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
+function drawLine(a,b,remote=false,who=name){if(!boardCtx)return;boardCtx.strokeStyle=remote?colorFor(who):getComputedStyle(document.body).getPropertyValue('--accent');boardCtx.lineWidth=2.5;boardCtx.beginPath();boardCtx.moveTo(a.x,a.y);boardCtx.lineTo(b.x,b.y);boardCtx.stroke()}
+function drawRemoteStroke(d){drawLine(d.a,d.b,true,d.name)}
+function clearBoardLocal(){if(boardCtx){const c=$('boardCanvas');boardCtx.clearRect(0,0,c.width,c.height)}}
+function renderSharedCursor(d){let el=document.querySelector('.shared-cursor[data-id="'+CSS.escape(d.clientId)+'"]');if(!el){el=document.createElement('div');el.className='shared-cursor';el.dataset.id=d.clientId;el.textContent=d.name||'User';$('cursorLayer').appendChild(el)}el.style.left=d.x+'px';el.style.top=d.y+'px'}
+function openBoard(){boardOpen=true;$('whiteboard').style.display='flex';setTimeout(resizeBoard,0)}$('boardBtn').onclick=()=>{openBoard();$('toolsPanel').classList.remove('open')};$('closeBoard').onclick=()=>{boardOpen=false;$('whiteboard').style.display='none';$('cursorLayer').innerHTML=''};$('clearBoard').onclick=()=>{clearBoardLocal();send({type:'boardClear',clientId,name})};
+$('boardCanvas').addEventListener('pointerdown',e=>{boardDrawing=true;boardLast=boardPoint(e);$('boardCanvas').setPointerCapture(e.pointerId)});$('boardCanvas').addEventListener('pointermove',e=>{const p=boardPoint(e);if(boardOpen)send({type:'cursor',clientId,name,x:p.x,y:p.y});if(!boardDrawing)return;drawLine(boardLast,p);send({type:'boardStroke',clientId,name,a:boardLast,b:p});boardLast=p});['pointerup','pointercancel'].forEach(ev=>$('boardCanvas').addEventListener(ev,()=>{boardDrawing=false;boardLast=null}));window.addEventListener('resize',()=>{if(boardOpen)resizeBoard()});
+setInterval(()=>{if(debugState.enabled){$('netState').textContent=ws?['CONNECTING','OPEN','CLOSING','CLOSED'][ws.readyState]:'—';$('netUptime').textContent=Math.floor((Date.now()-network.started)/1000)+'s';$('netMessages').textContent=network.msgs;$('netRate').textContent=Math.round(network.events/Math.max(1,(Date.now()-network.started)/1000)*10)/10;$('netRtt').textContent=network.rtt.length?Math.round(network.rtt.reduce((a,b)=>a+b,0)/network.rtt.length)+' ms':'—';$('netReconnects').textContent=network.reconnects;$('netHeartbeat').textContent=network.lastHeartbeat?Math.floor((Date.now()-network.lastHeartbeat)/1000)+'s ago':'—';try{$('netHistory').textContent=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]').length}catch{$('netHistory').textContent='?'}renderNetworkPeers()}},500);
+
+function formatDuration(ms){let s=Math.max(0,Math.floor(ms/1000));const h=Math.floor(s/3600);s%=3600;const m=Math.floor(s/60);s%=60;return h?`${h}h ${m}m`:m?`${m}m ${s}s`:`${s}s`}
+function addFriendlyEvent(text){diag.timeline.push({friendly:true,time:new Date().toISOString(),message:text});if(diag.timeline.length>100)diag.timeline.shift()}
+
+function recordPopulation(){const now=Date.now();const n=members.size+1;const last=diag.population[diag.population.length-1];if(!last||now-last.t>2000){diag.population.push({t:now,n});if(diag.population.length>60)diag.population.shift()}}
+function updateDiagVisuals(){if(!$('debugPanel').classList.contains('open'))return;const avg=network.rtt.length?Math.round(network.rtt.reduce((a,b)=>a+b,0)/network.rtt.length):null;const dom=document.querySelectorAll('*').length;$('netFps').textContent=Math.round(diag.fps);$('netDom').textContent=dom.toLocaleString();$('netTraffic').textContent=((network.sentBytes||0)/1024).toFixed(1)+'K ↑ / '+((network.receivedBytes||0)/1024).toFixed(1)+'K ↓';$('netDelivery').textContent=diag.deliveryTotal?Math.round(diag.delivered/diag.deliveryTotal*100)+'%':'—';$('netBreakdown').innerHTML=Object.entries(diag.eventCounts).sort((a,b)=>b[1]-a[1]).slice(0,12).map(([k,v])=>'<span class="diag-tag">'+escapeHtml(k)+' '+v+'</span>').join('')||'<span class="diag-tag">No events yet</span>';const max=Math.max(1,...diag.population.map(x=>x.n));$('netPopulation').innerHTML=diag.population.map(x=>'<span class="diag-bar" title="'+x.n+' online" style="height:'+Math.max(2,Math.round(x.n/max*40))+'px"></span>').join('')||'<span class="net-label">Waiting for presence data</span>';const a=$('netAcks');a.innerHTML=[...diag.messageAcks.values()].slice(-15).reverse().map(x=>'<div class="diag-ack"><span>'+escapeHtml(x.from)+'</span><span>'+x.delivered.length+' delivered · '+x.seen.length+' seen</span></div>').join('')||'<span>No acknowledgements yet</span>'}
+let fpsLastFrame=performance.now();function fpsLoop(now){const dt=now-fpsLastFrame;fpsLastFrame=now;if(dt>0)diag.fps=diag.fps*.85+(1000/dt)*.15;requestAnimationFrame(fpsLoop)}requestAnimationFrame(fpsLoop);
+function updateStatusPanel(){const open=$('statusPanel').classList.contains('open');if(!open)return;const state=ws?['CONNECTING','OPEN','CLOSING','CLOSED'][ws.readyState]:'CLOSED';const icon=$('friendlyConnectionIcon'), title=$('friendlyConnection'), detail=$('friendlyConnectionDetail');title.textContent=state==='OPEN'?'Connected':state==='CONNECTING'?'Connecting…':'Reconnecting…';detail.textContent=state==='OPEN'?'Real-time chat connection is active':'The app is trying to reconnect automatically';icon.className='status-icon '+(state==='OPEN'?'good':state==='CONNECTING'?'warn':'bad');$('friendlyPeople').textContent=members.size;const avg=network.rtt.length?Math.round(network.rtt.reduce((a,b)=>a+b,0)/network.rtt.length):null;$('friendlyLatency').textContent=avg!==null?avg+' ms':'—';$('friendlyUptime').textContent=formatDuration(Date.now()-network.started);const rate=diag.deliveryTotal?Math.round(diag.delivered/diag.deliveryTotal*100):100;$('friendlyDelivery').textContent=diag.deliveryTotal?(rate+'%'):'—';const pl=$('friendlyPeopleList');pl.innerHTML='';[...members.values()].sort((a,b)=>(a.name||'').localeCompare(b.name||'')).forEach(m=>{const el=document.createElement('div');el.className='friendly-person';const dot=document.createElement('span');dot.className='friendly-dot';dot.style.background=colorFor(m.name||'Anonymous');const tx=document.createElement('span');tx.textContent=m.name||'Anonymous';const st=document.createElement('span');st.className='friendly-state';st.textContent=m.state==='idle'?'Idle':'Online';el.append(dot,tx,st);pl.appendChild(el)});const tl=$('friendlyTimeline');tl.innerHTML='';diag.timeline.slice(-12).reverse().forEach(e=>{const el=document.createElement('div');el.className='friendly-event';const t=document.createElement('span');t.className='friendly-event-time';t.textContent=new Date(e.time||Date.now()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});const x=document.createElement('span');x.textContent=e.friendly?e.message:(e.message||e.kind);el.append(t,x);tl.appendChild(el)});const health=$('friendlyHealth');let msg='Connection looks healthy';let cls='good';if(state!=='OPEN'){msg='Trying to restore the connection';cls='warn'}else if(avg!==null&&avg>250){msg='Connection is responding slowly';cls='warn'}else if(diag.deliveryTotal&&rate<80){msg='Some delivery confirmations are missing';cls='warn'}health.innerHTML='<span class="health-dot" style="background:'+(cls==='good'?'#35b86b':'#e3b341')+'"></span><span>'+msg+'</span>'}
+$('statusBtn').onclick=()=>{const panel=$('statusPanel');if(panel.classList.contains('open')){closePanels();debugLog('DOM','Status panel closed');return}openPanel('statusPanel');updateStatusPanel();debugLog('DOM','Status panel opened')};$('statusClose').onclick=()=>closePanels();$('statusPanel').onclick=e=>{if(e.target===$('statusPanel'))closePanels()};$('statusDiagnostics').onclick=()=>{debugEnable()};$('statusCopy').onclick=async()=>{const report=`Party room status\nConnection: ${$('friendlyConnection').textContent}\nPeople online: ${members.size}\nAverage response: ${network.rtt.length?Math.round(network.rtt.reduce((a,b)=>a+b,0)/network.rtt.length):'—'} ms\nDelivery confirmations: ${diag.deliveryTotal?Math.round(diag.delivered/diag.deliveryTotal*100)+'%':'—'}\nUptime: ${formatDuration(Date.now()-network.started)}`;try{await navigator.clipboard.writeText(report);addFriendlyEvent('Simple status report copied')}catch{}}
+$('diagPing').onclick=()=>{if(ws?.readyState!==WebSocket.OPEN){$('diagResult').textContent='Cannot ping: not connected.';return}const peers=[...members.values()].filter(m=>m.clientId&&m.clientId!==clientId);if(!peers.length){$('diagResult').textContent='No other connected clients to ping.';return}const t=Date.now();peers.forEach(m=>send({type:'diagPing',to:m.clientId,from:clientId,sentAt:t,clientId,name}));$('diagResult').textContent='Ping sent to '+peers.length+' client(s). Results will appear in the log.';debugLog('INFO','Diagnostic room ping started',{peers:peers.map(x=>x.name)})};
+$('diagStress').onclick=()=>{let n=Number(prompt('Number of local test events (max 1000):','100'));n=Math.max(1,Math.min(1000,n||100));const start=performance.now();for(let i=0;i<n;i++){const x=document.createElement('div');x.textContent='Diagnostic render test '+i;x.style.display='none';document.body.appendChild(x);x.remove()}const ms=Math.round(performance.now()-start);diag.stress+=n;$('diagResult').textContent=`Local UI stress test: ${n} elements in ${ms} ms. Nothing was sent to other users.`;debugLog('INFO','Local UI stress test completed',{events:n,ms})};
+$('diagPacket').onclick=()=>{if(ws?.readyState!==WebSocket.OPEN){$('diagResult').textContent='Cannot test packet: not connected.';return}const size=Math.min(50000,Math.max(100,Number(prompt('Test payload size in bytes (100–50000):','1000'))||1000));const id=crypto.randomUUID();const payload='x'.repeat(size);diag.packetTests.push({id,size,time:Date.now()});send({type:'diagPacket',id,from:clientId,to:'broadcast',payload});$('diagResult').textContent='Packet test sent: '+size.toLocaleString()+' bytes. Check Diagnostics for the result.';debugLog('INFO','Packet-size test sent',{id,size})};
+$('diagDisconnect').onclick=()=>{if(ws){debugLog('INFO','Manual disconnect simulation');ws.close(4000,'Diagnostic simulation');$('diagResult').textContent='Connection closed deliberately; automatic reconnect should begin.'}};
+function diagnosticReport(){return {generated:new Date().toISOString(),clientId,name,channel:CHANNEL,router:ROUTER,connection:ws?['CONNECTING','OPEN','CLOSING','CLOSED'][ws.readyState]:'NONE',uptimeMs:Date.now()-network.started,reconnects:network.reconnects,messages:network.msgs,events:network.events,sentBytes:network.sentBytes||0,receivedBytes:network.receivedBytes||0,avgRtt:network.rtt.length?Math.round(network.rtt.reduce((a,b)=>a+b,0)/network.rtt.length):null,members:[...members.values()],delivery:{confirmed:diag.delivered,total:diag.deliveryTotal},seen:diag.seen,packetTests:diag.packetTests,stressEvents:diag.stress,eventCounts:diag.eventCounts,population:diag.population,acknowledgements:[...diag.messageAcks.values()],fps:diag.fps,domNodes:document.querySelectorAll('*').length,timeline:diag.timeline.slice(-100),debug:debugState.events.slice(-100)}}
+$('diagExport').onclick=()=>{const blob=new Blob([JSON.stringify(diagnosticReport(),null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='party-room-diagnostics.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);debugLog('DOM','Diagnostics exported')};$('diagIncident').onclick=()=>{const r=diagnosticReport();r.incident=true;r.incidentWindow=diag.timeline.slice(-60);const blob=new Blob([JSON.stringify(r,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='party-room-incident.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);$('diagResult').textContent='Incident report saved with the most recent diagnostic activity.';debugLog('DOM','Incident report saved')};
+setInterval(()=>{recordPopulation();updateDiagVisuals();updateStatusPanel()},500);
+try{const h=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');h.slice(-50).forEach(d=>add(d,d.clientId===clientId,false))}catch{}
+connect();
+setInterval(()=>{if($('peoplePanel').classList.contains('open')){renderPeoplePanel();updateActivityPanel()}},1000);
+</script>
+<script>
+/* Party Chat updater: GitHub is used only to distribute app versions. Chat traffic
+   continues to use the existing WebSocket relay and is never routed through GitHub. */
+(function () {
+  'use strict';
+  var APP_VERSION = '1.0.1';
+  var MANIFEST_URL = 'https://raw.githubusercontent.com/ekemp20-del/party-chat-updates/main/manifest.json';
+  var BASE_URL = 'https://raw.githubusercontent.com/ekemp20-del/party-chat-updates/main/';
+  var CACHE_KEY = 'partychat.update.staged.v1';
+  var lastCheckAt = 0;
+  var checkInProgress = false;
+  var stagedVersion = null;
+  function el(id) { return document.getElementById(id); }
+  function compareVersions(a, b) {
+    var aa = String(a).split('.').map(function (x) { return parseInt(x, 10) || 0; });
+    var bb = String(b).split('.').map(function (x) { return parseInt(x, 10) || 0; });
+    for (var i = 0; i < Math.max(aa.length, bb.length); i++) {
+      var av = aa[i] || 0, bv = bb[i] || 0;
+      if (av !== bv) return av > bv ? 1 : -1;
+    }
+    return 0;
+  }
+  function setStatus(message, detail) {
+    if (el('updateStatus')) el('updateStatus').textContent = message;
+    if (el('updateLastCheck') && detail) el('updateLastCheck').textContent = detail;
+  }
+  function showStaged(version) {
+    stagedVersion = version;
+    if (el('applyUpdateBtn')) el('applyUpdateBtn').hidden = false;
+    setStatus('Update v' + version + ' is downloaded and ready. Restart Party Chat to install it.',
+      'Downloaded and verified · ' + new Date().toLocaleString());
+  }
+  function bytesToHex(buffer) {
+    return Array.prototype.map.call(new Uint8Array(buffer), function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+  }
+  async function sha256(text) {
+    if (!window.crypto || !crypto.subtle || !window.TextEncoder) throw new Error('Secure SHA-256 verification is not available in this browser.');
+    var bytes = new TextEncoder().encode(text);
+    return bytesToHex(await crypto.subtle.digest('SHA-256', bytes));
+  }
+  async function checkForUpdates(manual) {
+    if (checkInProgress) return;
+    checkInProgress = true;
+    if (el('checkUpdatesBtn')) { el('checkUpdatesBtn').disabled = true; el('checkUpdatesBtn').textContent = 'Checking…'; }
+    setStatus('Checking GitHub for updates…');
+    try {
+      var manifestResponse = await fetch(MANIFEST_URL + '?cacheBust=' + Date.now(), { cache: 'no-store', mode: 'cors' });
+      if (!manifestResponse.ok) throw new Error('Update manifest returned HTTP ' + manifestResponse.status + '.');
+      var manifest = await manifestResponse.json();
+      if (!manifest || manifest.app !== 'Party Chat' || !/^\d+(\.\d+){1,3}$/.test(String(manifest.version || ''))) throw new Error('The update manifest is invalid.');
+      if (compareVersions(manifest.version, APP_VERSION) <= 0) {
+        var prior = null;
+        try { prior = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); } catch (_) {}
+        if (prior && compareVersions(prior.version, APP_VERSION) > 0) showStaged(prior.version);
+        else setStatus('You are up to date · v' + APP_VERSION, 'Last checked · ' + new Date().toLocaleString());
+        return;
+      }
+      if (typeof manifest.sha256 !== 'string' || !/^[a-f0-9]{64}$/i.test(manifest.sha256)) throw new Error('The manifest is missing a valid SHA-256 checksum.');
+      var fileName = manifest.file || 'PartyChat.html';
+      if (fileName !== 'PartyChat.html') throw new Error('The update filename is not allowed.');
+      var appResponse = await fetch(BASE_URL + fileName + '?cacheBust=' + Date.now(), { cache: 'no-store', mode: 'cors' });
+      if (!appResponse.ok) throw new Error('The update download returned HTTP ' + appResponse.status + '.');
+      var html = await appResponse.text();
+      if (html.length < 10000 || html.length > 2500000) throw new Error('The downloaded update has an unexpected size.');
+      var expectedMarker = 'data-partychat-version="' + manifest.version + '"';
+      if (html.indexOf(expectedMarker) === -1 || html.indexOf('<title>Party Chat</title>') === -1 || html.indexOf('partychat.update.staged.v1') === -1) {
+        throw new Error('The downloaded file failed its application checks.');
+      }
+      var actualHash = await sha256(html);
+      if (actualHash.toLowerCase() !== manifest.sha256.toLowerCase()) throw new Error('The SHA-256 checksum did not match. The update was discarded.');
+      var staged = { version: manifest.version, html: html, sha256: actualHash, stagedAt: new Date().toISOString() };
+      localStorage.setItem(CACHE_KEY, JSON.stringify(staged));
+      showStaged(manifest.version);
+    } catch (err) {
+      setStatus((err && err.message) ? err.message : 'Could not check for updates.', 'Last attempted · ' + new Date().toLocaleString());
+      if (typeof debugLog === 'function') debugLog('WARN', 'Software update check failed', { error: String(err) });
+    } finally {
+      lastCheckAt = Date.now();
+      checkInProgress = false;
+      if (el('checkUpdatesBtn')) { el('checkUpdatesBtn').disabled = false; el('checkUpdatesBtn').textContent = 'Check now'; }
+    }
+  }
+  function initUpdater() {
+    if (el('updateInstalledVersion')) el('updateInstalledVersion').textContent = 'v' + APP_VERSION;
+    try {
+      var cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+      if (cached && compareVersions(cached.version, APP_VERSION) > 0) showStaged(cached.version);
+    } catch (_) {}
+    if (el('checkUpdatesBtn')) el('checkUpdatesBtn').addEventListener('click', function () { checkForUpdates(true); });
+    if (el('applyUpdateBtn')) el('applyUpdateBtn').addEventListener('click', function () {
+      if (!stagedVersion) return;
+      setStatus('Restarting to install v' + stagedVersion + '…');
+      /* Reload the original file; the head bootstrap swaps in the verified cached HTML. */
+      location.reload();
+    });
+    checkForUpdates(false);
+    setInterval(function () {
+      if (!document.hidden && Date.now() - lastCheckAt >= 10 * 60 * 1000) checkForUpdates(false);
+    }, 60 * 1000);
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden && Date.now() - lastCheckAt >= 60 * 1000) checkForUpdates(false);
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initUpdater, { once: true });
+  else initUpdater();
+})();
+</script>
+</body></html>
