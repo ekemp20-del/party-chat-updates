@@ -1,8 +1,8 @@
 {
   "app": "Party Chat",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "releasedAt": "2026-11-11",
   "file": "PartyChat.html",
-  "sha256": "9306a74805c1ff099f961e161c9a3fdfe280b631d2cdbffb7f5e8039f7a1269e",
-  "notes": "Moves all updates to a manual Settings action; offers Download HTML or Patch this browser; saves a previous-version backup and provides rollback; migrates existing users while preserving their names, themes and chat history; changes Settings to a rounded inline U+2261 button; strengthens gradients for non-default colours."
+  "sha256": "36b2e32ae97f270c8e1ce59828d82802e0acf08864161faf883858d8483f60a0",
+  "notes": "Adds an offline GIF/sticker picker. Users import the ZIP library once per browser; messages send stable asset IDs through the existing WebSocket instead of retransmitting GIF files. Includes animated previews, search, GIF/sticker tabs and missing-pack detection. Moves the photo, camera and more-options controls outside the message field while retaining their composer positions."
 }
