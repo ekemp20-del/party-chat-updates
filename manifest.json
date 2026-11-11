@@ -1,8 +1,8 @@
 {
   "app": "Party Chat",
-  "version": "1.0.2",
-  "releasedAt": "2026-11-11T17:02:12Z",
+  "version": "1.0.3",
+  "releasedAt": "2026-11-11",
   "file": "PartyChat.html",
-  "sha256": "24d2806a0c08806f9de36d65b788ff692840cfe352c4bedb7196393b0ba06156",
-  "notes": "Redesigned header and Settings menu, clearer display-name control, GitHub repository link, and a subtle accent-aware background gradient in light and dark modes."
+  "sha256": "46a197ffb4ffb99ae2020a92dfe5396d600bccf969adfc3a5527b840621b8f13",
+  "notes": "Fixes duplicate app rendering during staged updates; restores the original P logo; makes the U+2699 Settings gear a full-height header control with a small caption; increases spacing before the display-name field; clears stale staged updates and reports when up to date."
 }
