@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" data-partychat-version="1.0.5"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script>
+<html lang="en" data-partychat-version="1.0.6"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script>
 /* Party Chat bootstrap. Older settings/history keys are deliberately preserved. */
 (function () {
   'use strict';
-  var BASE_VERSION = '1.0.5';
+  var BASE_VERSION = '1.0.6';
   var ACTIVE_KEY = 'partychat.runtime.active.v1';
   var LEGACY_STAGE_KEY = 'partychat.update.staged.v1';
   var FRAME_NAME = 'partychat-update-runtime';
@@ -287,7 +287,7 @@ body.dark{
 }
 
 
-/* Party Chat 1.0.5 — manual updates, reversible browser patching and stronger theme gradients */
+/* Party Chat 1.0.6 — manual updates, reversible browser patching and stronger theme gradients */
 #settingsBtn.settings-trigger{
   align-self:center!important;height:44px!important;min-height:44px!important;width:auto!important;min-width:122px!important;
   flex:0 0 auto!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;
@@ -378,6 +378,33 @@ body.dark.theme-blue #messages,body.dark.theme-green #messages,body.dark.theme-p
 .gif-caption{padding:6px 7px 3px;font-size:12px;line-height:1.35;white-space:pre-wrap;overflow-wrap:anywhere}
 @media(max-width:520px){.gif-picker{left:8px;bottom:76px;width:calc(100vw - 16px);max-height:58vh;padding:10px}.gif-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.gif-card img,.gif-card .gif-thumb-empty{height:70px}.gif-picker-btn{flex-basis:32px;width:32px;height:32px;font-size:9px}.image-attach-btn{flex-basis:30px;width:30px;height:32px;margin-left:0}#toolsBtn{width:30px;height:32px}form{gap:4px}.compose-shell{min-width:65px;padding-left:10px;padding-right:5px}form>button[type=submit]{min-width:54px;padding:0 12px}}
 
+
+/* Composer controls share one consistent visual system */
+form{align-items:center!important;gap:7px!important}
+.compose-shell{height:42px!important;min-height:42px!important;border-radius:22px!important;background:var(--surface-2)!important;border:1px solid var(--border)!important;padding:0 13px!important}
+#text{height:40px!important}
+.gif-picker-btn,.image-attach-btn,#toolsBtn{
+  box-sizing:border-box!important;display:grid!important;place-items:center!important;
+  flex:0 0 42px!important;width:42px!important;min-width:42px!important;
+  height:42px!important;min-height:42px!important;margin:0!important;padding:0!important;
+  border:1px solid var(--border)!important;border-radius:22px!important;
+  background:var(--surface-2)!important;color:var(--muted)!important;
+  box-shadow:none!important;line-height:1!important;transition:background .15s,border-color .15s,color .15s!important
+}
+.image-attach-btn svg{width:18px!important;height:18px!important}
+.gif-picker-btn{font-size:10px!important;font-weight:850!important;letter-spacing:-.04em!important}
+#toolsBtn{font-size:22px!important;font-weight:400!important}
+.tools-wrap{display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 42px!important;width:42px!important}
+.gif-picker-btn:hover,.image-attach-btn:hover,#toolsBtn:hover,.gif-picker-btn[aria-expanded="true"]{background:var(--surface-3)!important;border-color:var(--border)!important;color:var(--text)!important}
+.gif-picker-btn:focus-visible,.image-attach-btn:focus-visible,#toolsBtn:focus-visible{outline:2px solid var(--accent)!important;outline-offset:2px!important}
+@media(max-width:520px){
+  form{gap:4px!important}
+  .gif-picker-btn,.image-attach-btn,#toolsBtn{flex-basis:36px!important;width:36px!important;min-width:36px!important;height:42px!important;min-height:42px!important}
+  .tools-wrap{flex-basis:36px!important;width:36px!important}
+  .compose-shell{padding-left:10px!important;padding-right:8px!important;min-width:45px!important}
+  form>button[type=submit]{min-width:54px!important;padding:0 12px!important}
+}
+
 </style></head><body>
 <header>
   <div class="brand">
@@ -412,7 +439,7 @@ body.dark.theme-blue #messages,body.dark.theme-green #messages,body.dark.theme-p
   </div>
   <div class="settings-section">
     <div class="settings-section-label">APP</div>
-    <div class="settings-row"><span>Version</span><strong id="updateInstalledVersion" style="font-size:11px;font-weight:650">v1.0.5</strong></div>
+    <div class="settings-row"><span>Version</span><strong id="updateInstalledVersion" style="font-size:11px;font-weight:650">v1.0.6</strong></div>
     <div class="settings-row update-settings-row"><div style="min-width:0;flex:1"><div style="font-size:11px;font-weight:650">Software updates</div><div id="updateStatus" class="update-status" role="status" aria-live="polite">Updates are manual. Select Check for updates when you want to look for a release.</div><div id="updateLastCheck" class="update-last-check">No background checks or downloads.</div></div></div>
     <div class="settings-row update-buttons"><button type="button" id="checkUpdatesBtn" class="update-action primary">Check for updates</button></div>
     <div class="settings-row update-buttons"><button type="button" id="downloadUpdateBtn" class="update-action" hidden>Download new HTML</button><button type="button" id="patchUpdateBtn" class="update-action primary" hidden>Patch this browser</button></div>
@@ -432,13 +459,13 @@ body.dark.theme-blue #messages,body.dark.theme-green #messages,body.dark.theme-p
 <div id="debugPanel" class="debug-panel"><div class="debug-head"><strong>DIAGNOSTICS</strong><button id="debugClear">Clear</button><button id="debugCopy">Copy log</button><button id="debugClose" class="panel-close">✕ Close</button><span id="debugStats" class="debug-stats">0 events</span></div><div class="network-lab"><div class="net-card"><div class="net-label">WebSocket</div><div class="net-value" id="netState">—</div></div><div class="net-card"><div class="net-label">Uptime</div><div class="net-value" id="netUptime">—</div></div><div class="net-card"><div class="net-label">Messages</div><div class="net-value" id="netMessages">0</div></div><div class="net-card"><div class="net-label">Events / sec</div><div class="net-value" id="netRate">0</div></div><div class="net-card"><div class="net-label">Delivery RTT</div><div class="net-value" id="netRtt">—</div></div><div class="net-card"><div class="net-label">Reconnects</div><div class="net-value" id="netReconnects">0</div></div><div class="net-card"><div class="net-label">Last heartbeat</div><div class="net-value" id="netHeartbeat">—</div></div><div class="net-card"><div class="net-label">Local history</div><div class="net-value" id="netHistory">0</div></div><div class="net-card net-peers"><div class="net-label">Connected clients</div><div id="netPeers"></div></div><div class="net-card"><div class="net-label">FPS</div><div class="net-value" id="netFps">—</div></div><div class="net-card"><div class="net-label">DOM nodes</div><div class="net-value" id="netDom">—</div></div><div class="net-card"><div class="net-label">Traffic</div><div class="net-value" id="netTraffic">—</div></div><div class="net-card"><div class="net-label">Delivery</div><div class="net-value" id="netDelivery">—</div></div><div class="net-card net-peers"><div class="net-label">Event breakdown</div><div id="netBreakdown" class="diag-breakdown"></div></div><div class="net-card net-peers"><div class="net-label">Population history</div><div id="netPopulation" class="diag-bars"></div></div><div class="net-card net-peers"><div class="net-label">Message acknowledgements</div><div id="netAcks" class="diag-acks"></div></div><div class="net-card net-peers"><div class="net-label">Diagnostics tools</div><div class="diag-tools"><button id="diagPing">Ping room</button><button id="diagStress">Stress test</button><button id="diagPacket">Packet test</button><button id="diagDisconnect">Simulate disconnect</button><button id="diagIncident">Save incident report</button><button id="diagExport">Export diagnostics</button></div><div id="diagResult" class="diag-result">Ready.</div></div></div><div id="debugLog" class="debug-log"></div></div>
 
 <div id="messages"></div>
-<div id="about"><div class="about-box"><button class="about-close" id="aboutClose">Close</button><h2>About Party Chat</h2><p>Party Chat is a browser-based public chat room designed to let people join without an account or app installation.</p><p>Your browser connects to the existing encrypted WebSocket relay. Text, replies, reactions, presence, polls, countdowns, whiteboard events, images and GIF/sticker IDs are sent through that same connection to other people in the room.</p><p>Images are prepared locally at the highest practical quality that fits the WebSocket frame limit. GIFs and stickers are selected from an offline library stored in this browser; only a small asset ID is sent through the room, not the GIF file itself.</p><p>Your chosen name and local chat history are stored only in this browser.</p></div></div>
+<div id="about"><div class="about-box"><button class="about-close" id="aboutClose">Close</button><h2>About Party Chat</h2><p>Party Chat is a browser-based public chat room designed to let people join without an account or app installation.</p><p>Your browser connects to the existing encrypted WebSocket relay. Text, replies, reactions, presence, polls, countdowns, whiteboard events, images and GIF/sticker IDs are sent through that same connection to other people in the room.</p><p>Images are prepared locally at the highest practical quality that fits the WebSocket frame limit. GIFs and stickers are downloaded from the shared Party Chat library on GitHub with one click, then stored locally for offline use; only a small asset ID is sent through the room, not the GIF file itself.</p><p>Your chosen name and local chat history are stored only in this browser.</p></div></div>
 <div class="typing-wrap"><div id="typing" class="typing-bubble"></div></div>
 <div class="members-bar"><span class="members-label">ONLINE</span><div id="memberList" class="member-list"></div></div>
 <div id="replyPreview" class="reply-preview"><span id="replyText"></span><button id="cancelReply">Cancel</button></div>
 <div id="imagePreviewPanel" class="image-preview-panel" aria-live="polite"><img id="imagePreviewThumb" alt="Selected image preview"><div class="image-preview-details"><strong id="imagePreviewName">Image selected</strong><span id="imagePreviewStatus">Ready to send</span></div><div class="image-preview-actions"><button type="button" id="imageCancelBtn" class="image-cancel-btn">Cancel</button><button type="button" id="imageSendBtn" class="image-send-btn">Send image</button></div></div>
 <form id="form"><button type="button" id="gifBtn" class="gif-picker-btn" title="GIFs and stickers" aria-label="Open GIFs and stickers" aria-expanded="false">GIF</button><div class="compose-shell"><input id="text" maxlength="1000" autocomplete="off" placeholder="Message…"></div><button type="button" id="imageBtn" class="image-attach-btn" title="Send a photo" aria-label="Send a photo"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.25" y="4.25" width="17.5" height="15.5" rx="2.25"></rect><circle cx="8.5" cy="9" r="1.5"></circle><path d="m4.5 17 5-5 3.1 3.1 2.4-2.4 4.5 4.5"></path></svg></button><input id="imageFileInput" type="file" accept="image/*" hidden><button type="button" id="cameraBtn" class="image-attach-btn camera-attach-btn" title="Take a photo" aria-label="Take a photo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5h3l1.4-2h7.2l1.4 2h3A1.5 1.5 0 0 1 21.5 9v9A1.5 1.5 0 0 1 20 19.5H4A1.5 1.5 0 0 1 2.5 18V9A1.5 1.5 0 0 1 4 7.5Z"></path><circle cx="12" cy="13.2" r="3.6"></circle></svg></button><input id="cameraFallbackInput" type="file" accept="image/*" capture="environment" hidden><div class="tools-wrap"><button type="button" id="toolsBtn" title="More options">＋</button><div id="toolsPanel" class="tools-panel"><h3>More from Party Chat</h3><div class="tools-grid"><button type="button" id="tempBtn">Temporary message</button><button type="button" id="pollBtn">Create a poll</button><button type="button" id="countBtn">Countdown</button><button type="button" id="boardBtn">Shared whiteboard</button></div><div class="tool-section"><label>Temporary message duration</label><select id="tempDuration"><option value="10000">10 seconds</option><option value="30000">30 seconds</option><option value="60000">1 minute</option><option value="300000">5 minutes</option></select></div></div></div><button type="submit">Send</button></form>
-<div id="gifPicker" class="gif-picker" role="dialog" aria-label="GIF and sticker library" aria-hidden="true"><div class="gif-picker-head"><div><strong>GIFs &amp; Stickers</strong><small id="gifPackStatus">No offline library installed yet.</small></div><button type="button" id="gifClose" aria-label="Close GIF picker">✕</button></div><div class="gif-picker-controls"><div class="gif-tabs"><button type="button" id="gifTabGifs" class="active" aria-pressed="true">GIFs <span id="gifCount">0</span></button><button type="button" id="gifTabStickers" aria-pressed="false">Stickers <span id="stickerCount">0</span></button></div><button type="button" id="gifImportBtn" class="gif-import-btn">Import / replace pack</button></div><input id="gifSearch" class="gif-search" type="search" placeholder="Search your GIFs…" autocomplete="off" aria-label="Search GIFs and stickers"><div id="gifImportStatus" class="gif-import-status" role="status" aria-live="polite" hidden></div><div id="gifGrid" class="gif-grid"></div></div><input id="gifPackInput" type="file" accept=".zip,application/zip" hidden>
+<div id="gifPicker" class="gif-picker" role="dialog" aria-label="GIF and sticker library" aria-hidden="true"><div class="gif-picker-head"><div><strong>GIFs &amp; Stickers</strong><small id="gifPackStatus">Download the shared library once to use it offline.</small></div><button type="button" id="gifClose" aria-label="Close GIF picker">✕</button></div><div class="gif-picker-controls"><div class="gif-tabs"><button type="button" id="gifTabGifs" class="active" aria-pressed="true">GIFs <span id="gifCount">0</span></button><button type="button" id="gifTabStickers" aria-pressed="false">Stickers <span id="stickerCount">0</span></button></div><button type="button" id="gifImportBtn" class="gif-import-btn">Download GIF library</button></div><input id="gifSearch" class="gif-search" type="search" placeholder="Search your GIFs…" autocomplete="off" aria-label="Search GIFs and stickers"><div id="gifImportStatus" class="gif-import-status" role="status" aria-live="polite" hidden></div><div id="gifGrid" class="gif-grid"></div></div>
 <div id="profilePop" class="profile-pop"></div>
 <div id="whiteboard"><div class="whiteboard-box"><div class="whiteboard-head"><div><strong>Shared whiteboard</strong><div class="whiteboard-note">Everyone needs to have the whiteboard open to see the live drawing.</div></div><button id="clearBoard">Clear</button><button id="closeBoard">Close</button></div><div class="whiteboard-canvas-wrap"><canvas id="boardCanvas" class="whiteboard-canvas"></canvas><div id="cursorLayer" class="cursor-layer"></div></div></div></div>
 <div id="cameraModal" class="camera-modal" role="dialog" aria-modal="true" aria-labelledby="cameraTitle" aria-hidden="true">
@@ -737,7 +764,8 @@ function closeGifPicker(){const p=$('gifPicker');p.classList.remove('open');p.se
 async function refreshGifLibrary(){
   gifLibraryMeta=await gifDbGet('meta','library');gifIndexCache=gifLibraryMeta?await gifDbGetAll('index'):[];
   gifIndexCache.sort((a,b)=>a.name.localeCompare(b.name));
-  $('gifPackStatus').textContent=gifLibraryMeta?(gifLibraryMeta.count+' items installed · '+formatGifBytes(gifLibraryMeta.bytes)+' offline'):'No offline library installed yet.';
+  $('gifPackStatus').textContent=gifLibraryMeta?(gifLibraryMeta.count+' items installed · '+formatGifBytes(gifLibraryMeta.bytes)+' offline'):'Download the shared library once to use it offline.';
+  if($('gifImportBtn')&&!gifDownloadBusy)$('gifImportBtn').textContent=gifLibraryMeta?'Check for updates':'Download GIF library';
   $('gifCount').textContent=gifIndexCache.filter(x=>x.kind==='gif').length;$('stickerCount').textContent=gifIndexCache.filter(x=>x.kind==='sticker').length;
   return gifIndexCache;
 }
@@ -749,9 +777,9 @@ function renderGifPicker(){
   $('gifTabStickers').classList.toggle('active',isSticker);$('gifTabStickers').setAttribute('aria-pressed',String(isSticker));
   const q=$('gifSearch').value.trim().toLowerCase(),items=gifIndexCache.filter(x=>(isSticker?x.kind==='sticker':x.kind!=='sticker')&&(!q||(x.name+' '+x.path+' '+x.category).toLowerCase().includes(q)));
   if(!gifLibraryMeta){
-    const empty=document.createElement('div');empty.className='gif-empty';const strong=document.createElement('strong');strong.textContent='Import your GIF pack';
-    const msg=document.createElement('span');msg.textContent='Choose PartyChatGifs.zip once. The library will then work offline in this browser.';
-    const btn=document.createElement('button');btn.type='button';btn.textContent='Choose ZIP file';btn.onclick=()=>$('gifPackInput').click();empty.append(strong,msg,btn);grid.appendChild(empty);return;
+    const empty=document.createElement('div');empty.className='gif-empty';const strong=document.createElement('strong');strong.textContent='Get the Party Chat GIF library';
+    const msg=document.createElement('span');msg.textContent='Download the shared collection directly from GitHub. It is stored locally afterwards and works offline.';
+    const btn=document.createElement('button');btn.type='button';btn.textContent='Download GIF library';btn.onclick=downloadGithubGifLibrary;empty.append(strong,msg,btn);grid.appendChild(empty);return;
   }
   if(!items.length){
     const empty=document.createElement('div');empty.className='gif-empty';const strong=document.createElement('strong');strong.textContent=isSticker?'No stickers in this pack yet.':'No GIFs match your search.';
@@ -811,7 +839,68 @@ function sendGifAsset(asset){
   add(d,true);$('text').value='';replyTo=null;$('replyPreview').classList.remove('visible');$('text').focus();closeGifPicker();
   debugLog('GIF','GIF/sticker ID sent through the existing WebSocket',{messageId:d.id,assetId:asset.id,packId:asset.packId});
 }
-async function importGifPack(file){
+
+const GIF_LIBRARY_MANIFEST_URL='https://raw.githubusercontent.com/ekemp20-del/party-chat-updates/main/gif-library/manifest.json';
+const GIF_LIBRARY_BASE_URL='https://raw.githubusercontent.com/ekemp20-del/party-chat-updates/main/gif-library/';
+let gifDownloadBusy=false;
+function bytesToHex(buffer){return Array.prototype.map.call(new Uint8Array(buffer),b=>b.toString(16).padStart(2,'0')).join('')}
+async function verifyGifChunk(buffer,expected){
+  if(!window.crypto||!window.crypto.subtle)throw new Error('This browser cannot verify the downloaded GIF pack securely. Open Party Chat in an up-to-date browser.');
+  const digest=await window.crypto.subtle.digest('SHA-256',buffer);
+  return bytesToHex(digest).toLowerCase()===String(expected||'').toLowerCase();
+}
+async function downloadGithubGifLibrary(){
+  if(gifDownloadBusy)return;
+  gifDownloadBusy=true;$('gifImportBtn').disabled=true;$('gifImportBtn').textContent='Connecting…';
+  try{
+    gifPickerStatus('Checking the Party Chat GIF library on GitHub…');
+    const manifestResponse=await fetch(GIF_LIBRARY_MANIFEST_URL+'?check='+Date.now(),{cache:'no-store',mode:'cors'});
+    if(!manifestResponse.ok)throw new Error('The GitHub GIF library manifest returned HTTP '+manifestResponse.status+'.');
+    const manifest=await manifestResponse.json();
+    if(!manifest||manifest.app!=='Party Chat GIF Library'||!/^\d+\.\d+\.\d+$/.test(String(manifest.version||''))||
+       typeof manifest.packId!=='string'||!/^pcpack_[a-f0-9]{16}$/.test(manifest.packId)||
+       !Array.isArray(manifest.chunks)||manifest.chunks.length<1||manifest.chunks.length>20||
+       manifest.chunkCount!==manifest.chunks.length||!Number.isSafeInteger(manifest.archiveBytes)||manifest.archiveBytes<1||manifest.archiveBytes>300*1024*1024){
+      throw new Error('The hosted GIF library manifest is invalid.');
+    }
+    if(gifLibraryMeta&&gifLibraryMeta.packId===manifest.packId){
+      gifPickerStatus('The latest GIF library is already installed.',manifest.assetCount+' items available offline');
+      $('gifImportBtn').textContent='Check for updates';return;
+    }
+    const parts=[];let received=0;
+    for(let i=0;i<manifest.chunks.length;i++){
+      const chunk=manifest.chunks[i];
+      if(!chunk||typeof chunk.file!=='string'||!/^part-\d{2}\.bin$/.test(chunk.file)||
+         !Number.isSafeInteger(chunk.bytes)||chunk.bytes<1||chunk.bytes>20*1024*1024||
+         typeof chunk.sha256!=='string'||! /^[a-f0-9]{64}$/i.test(chunk.sha256)){
+        throw new Error('A GIF library chunk entry is invalid.');
+      }
+      gifPickerStatus('Downloading the GIF library…','Part '+(i+1)+' of '+manifest.chunks.length+' · '+formatGifBytes(received)+' received');
+      const response=await fetch(GIF_LIBRARY_BASE_URL+chunk.file+'?v='+encodeURIComponent(manifest.version),{cache:'force-cache',mode:'cors'});
+      if(!response.ok)throw new Error('GIF library file '+chunk.file+' is not available on GitHub yet (HTTP '+response.status+').');
+      const data=await response.arrayBuffer();
+      if(data.byteLength!==chunk.bytes)throw new Error('The downloaded size of '+chunk.file+' did not match the manifest.');
+      if(!await verifyGifChunk(data,chunk.sha256))throw new Error('The integrity check failed for '+chunk.file+'. The download was discarded.');
+      parts.push(new Blob([data]));received+=data.byteLength;
+    }
+    if(received!==manifest.archiveBytes)throw new Error('The combined GIF library size did not match its manifest.');
+    gifPickerStatus('All files downloaded and verified. Importing…',formatGifBytes(received));
+    const archive=new File(parts,manifest.archiveName||'PartyChatGifs.zip',{type:'application/zip',lastModified:Date.now()});
+    const imported=await importGifPack(archive,{source:'github',version:manifest.version,packId:manifest.packId});
+    if(!imported)throw new Error('The downloaded archive could not be imported. See the status above and try again.');
+    gifPickerStatus('GIF library installed successfully.',manifest.assetCount+' items · available offline in this browser');
+    $('gifImportBtn').textContent='Check for updates';
+    debugLog('GIF','GitHub GIF library downloaded and installed',{packId:manifest.packId,version:manifest.version,assets:manifest.assetCount,bytes:received});
+  }catch(err){
+    gifPickerStatus('Could not install the GIF library: '+(err&&err.message||err),'You can retry with the button above.');
+    $('gifImportBtn').textContent='Retry download';
+    debugLog('ERROR','GitHub GIF library download failed',{error:String(err)});
+  }finally{
+    gifDownloadBusy=false;$('gifImportBtn').disabled=false;
+  }
+}
+
+async function importGifPack(file,sourceInfo=null){
   if(!file)return;
   if(file.size>300*1024*1024){gifPickerStatus('This ZIP is larger than the 300 MB import limit.');return}
   gifPickerStatus('Reading ZIP directory…');
@@ -826,7 +915,7 @@ async function importGifPack(file){
     if(!entries.length)throw new Error('No supported GIFs or sticker images were found. GIFs are supported anywhere; PNG/WebP stickers must be inside a stickers folder.');
     const totalBytes=entries.reduce((sum,e)=>sum+e.size,0);if(totalBytes>300*1024*1024)throw new Error('The extracted library is larger than the 300 MB import limit.');
     const uniqueEntries=[],seenPaths=new Set();entries.forEach(e=>{if(!seenPaths.has(e.path)){seenPaths.add(e.path);uniqueEntries.push(e)}});
-    const packSignature=uniqueEntries.slice().sort((a,b)=>a.path.localeCompare(b.path)).map(e=>e.path+'|'+e.crc+'|'+e.size+'|'+e.method).join('\n'),packId='pcpack_'+gifHash(packSignature);
+    const packSignature=uniqueEntries.slice().sort((a,b)=>a.path.localeCompare(b.path)).map(e=>e.path+'|'+e.crc+'|'+e.size+'|'+e.method).join('\n'),computedPackId='pcpack_'+gifHash(packSignature),packId=sourceInfo&&sourceInfo.packId?sourceInfo.packId:computedPackId;
     gifPickerStatus('Preparing '+uniqueEntries.length+' animated assets…');
     if(navigator.storage&&navigator.storage.estimate){const estimate=await navigator.storage.estimate().catch(()=>null);if(estimate&&estimate.quota&&estimate.usage!=null&&estimate.quota-estimate.usage<totalBytes+10*1024*1024)throw new Error('There may not be enough browser storage for this pack ('+formatGifBytes(totalBytes)+' required). Free some space or use a browser with more storage available.')}
     revokeGifThumbUrls();for(const url of gifAssetUrls.values())URL.revokeObjectURL(url);gifAssetUrls.clear();await gifDbClear();
@@ -841,14 +930,14 @@ async function importGifPack(file){
       await gifDbPutAsset({id,packId,blob},{id,packId,name,path:entry.path,size:entry.size,kind,category,thumb});
       completed++;gifPickerStatus('Importing '+name+'…',completed+' / '+uniqueEntries.length);
     }
-    await gifDbPutMeta({key:'library',packId,count:uniqueEntries.length,bytes:totalBytes,archiveName:file.name,installedAt:new Date().toISOString()});
+    await gifDbPutMeta({key:'library',packId,count:uniqueEntries.length,bytes:totalBytes,archiveName:file.name,installedAt:new Date().toISOString(),source:sourceInfo&&sourceInfo.source||'local',libraryVersion:sourceInfo&&sourceInfo.version||null});
     await refreshGifLibrary();renderGifPicker();refreshMissingGifMessages();
     gifPickerStatus('Library installed successfully.',completed+' assets · '+formatGifBytes(totalBytes)+' stored offline');
-    debugLog('GIF','Offline GIF library imported',{packId,count:completed,bytes:totalBytes,archive:file.name});
+    debugLog('GIF','Offline GIF library imported',{packId,count:completed,bytes:totalBytes,archive:file.name,source:sourceInfo&&sourceInfo.source||'local'});return true;
   }catch(err){
     try{await gifDbClear()}catch(_){}
     gifLibraryMeta=null;gifIndexCache=[];renderGifPicker();gifPickerStatus('Import failed: '+(err&&err.message||err)+' Choose the ZIP again to retry.');
-    debugLog('ERROR','Offline GIF library import failed',{error:String(err),file:file.name});
+    debugLog('ERROR','Offline GIF library import failed',{error:String(err),file:file.name});return false;
   }
 }
 
@@ -981,8 +1070,7 @@ $('gifBtn').onclick=openGifPicker;$('gifClose').onclick=closeGifPicker;
 $('gifTabGifs').onclick=()=>{gifPickerTab='gifs';renderGifPicker()};
 $('gifTabStickers').onclick=()=>{gifPickerTab='stickers';renderGifPicker()};
 $('gifSearch').oninput=renderGifPicker;
-$('gifImportBtn').onclick=()=>$('gifPackInput').click();
-$('gifPackInput').onchange=e=>{const f=e.target.files&&e.target.files[0];e.target.value='';if(f)importGifPack(f)};
+$('gifImportBtn').onclick=downloadGithubGifLibrary;
 document.addEventListener('click',e=>{if(!$('gifPicker').contains(e.target)&&e.target!==$('gifBtn')&&!$('gifBtn').contains(e.target))closeGifPicker()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('gifPicker').classList.contains('open'))closeGifPicker()});
 
@@ -1088,7 +1176,7 @@ setInterval(()=>{if($('peoplePanel').classList.contains('open')){renderPeoplePan
   'use strict';
   if (window.__PARTYCHAT_BOOTSTRAP_ONLY__) return;
 
-  var APP_VERSION = '1.0.5';
+  var APP_VERSION = '1.0.6';
   var MANIFEST_URL = 'https://raw.githubusercontent.com/ekemp20-del/party-chat-updates/main/manifest.json';
   var BASE_URL = 'https://raw.githubusercontent.com/ekemp20-del/party-chat-updates/main/';
   var ACTIVE_KEY = 'partychat.runtime.active.v1';
