@@ -1,0 +1,57 @@
+{
+  "app": "Party Chat GIF Library",
+  "version": "1.0.0",
+  "packId": "pcpack_81845c5e4aa2e910",
+  "archiveName": "PartyChatGifs.zip",
+  "archiveBytes": 122603708,
+  "assetCount": 53,
+  "gifCount": 53,
+  "chunkCount": 9,
+  "chunks": [
+    {
+      "file": "part-01.bin",
+      "bytes": 14680064,
+      "sha256": "d22955b2a05229c00f88f7e4af59fb0ef49a7a5dbd637ba26c65344b3fa33ed1"
+    },
+    {
+      "file": "part-02.bin",
+      "bytes": 14680064,
+      "sha256": "f0d51fc3e5abf70302deca86be85b6ab3ecd351a4d7fe7cb1349099fdce6b1aa"
+    },
+    {
+      "file": "part-03.bin",
+      "bytes": 14680064,
+      "sha256": "e4e0111fee13281690683f633c5db5986ab5006e6a4ce0f55ca2fd96de2ce6d3"
+    },
+    {
+      "file": "part-04.bin",
+      "bytes": 14680064,
+      "sha256": "ff50c19f19e4cd56683a4be45afb5f4c0f27a0c4a97b4f704418a7ad4c48081a"
+    },
+    {
+      "file": "part-05.bin",
+      "bytes": 14680064,
+      "sha256": "855b7f4165b7ed816eb5f5102473aaf33a559fe1a368405104e0cfc7e55dceb7"
+    },
+    {
+      "file": "part-06.bin",
+      "bytes": 14680064,
+      "sha256": "a65b71f38b7157a3a2f989ed3e9d90730c4344ab26c53220aa2e0e53dd508870"
+    },
+    {
+      "file": "part-07.bin",
+      "bytes": 14680064,
+      "sha256": "f4105bb67afb3f1e62eee34aaa33e44cf6fc771249379599b20c5b59f62431f8"
+    },
+    {
+      "file": "part-08.bin",
+      "bytes": 14680064,
+      "sha256": "92df4bee7ef9e4b6dfa61377c5e4d696860bf62a540a42f7cf6062d1c34590ca"
+    },
+    {
+      "file": "part-09.bin",
+      "bytes": 5163196,
+      "sha256": "a82feb9e220b2f94bdb8e07b19dc52e7e2742f6c7d143ffcdd123fcb4054ee87"
+    }
+  ]
+}
