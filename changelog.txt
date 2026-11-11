@@ -1,13 +1,11 @@
-Party Chat 1.0.3 — 11 November 2026
+Party Chat 1.0.4 — 11 November 2026
 
-- Fixed duplicate Party Chat interfaces after staged updates. New releases now open in a single full-screen same-origin frame instead of using document.write while the original file is still being parsed.
-- Retains the staged release in local browser storage so it remains available on later launches even though the original local HTML file cannot overwrite itself.
-- Restarting an update from the staged app now reloads the original local HTML file so the newest cached release is activated.
-- Restored the original P logo.
-- Replaced the Settings SVG with the U+2699 gear symbol, filling the full 64px header height with a small Settings caption beneath it.
-- Increased the space between the Settings control and the display-name control.
-- Corrected update-state handling: obsolete staged versions are cleared, the apply button is hidden when there is no newer version, and matching versions report that Party Chat is up to date.
-- Clears a version number accidentally saved as a display name by the earlier broken update.
-- Preserved WebSocket messaging, image messaging, in-chat camera, the settings menu, GitHub link and adaptive gradient.
-
-Repair note: users running v1.0.2 should replace their local PartyChat.html with v1.0.3 once. The v1.0.2 bootstrap is the part that causes the duplicate interface and cannot safely repair itself. Future releases can use the corrected in-app updater.
+- Removed automatic update checks, background timers and automatic downloads. Users now choose Settings > Check for updates.
+- After a verified update is found, users can either download a standalone replacement HTML file or patch the current browser profile.
+- Browser patching saves the current running version as a backup before activating the new build.
+- Added a Settings rollback button that restores the saved prior version, including when the local launch file is older or newer than the backup.
+- Kept the local HTML file unchanged when using Patch this browser; this is required by browser file-access restrictions.
+- Added migration from the earlier automatic updater. Only its obsolete staging key is removed; display name, theme, dark mode and chat history keys are preserved.
+- Changed the Settings control to a rounded button with the U+2261 symbol and larger text alongside it.
+- Made the selected-colour background gradient more noticeable for all non-default themes in light and dark mode, while retaining the softer default gradient.
+- Kept existing WebSocket messaging, image messaging, camera support, people/status/diagnostics/about panels and GitHub hosting.
